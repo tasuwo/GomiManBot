@@ -10,6 +10,9 @@
 
 module.exports = (robot) ->
 
+  robot.hear /ゴミ/i, (msg) ->
+    msg.send msg.random ["I am gomi-man-bot."]
+
   # robot.hear /badger/i, (res) ->
   #   res.send "Badgers? BADGERS? WE DON'T NEED NO STINKIN BADGERS"
   #
