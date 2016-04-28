@@ -1,15 +1,13 @@
+uuid = require "./uuid.coffee"
+
 module.exports = (robot) ->
   USERS_KEY = 'users'
-  MAX_ID_KEY = 'max_id'
-
-  getMaxId = () ->
-    return robot.brain.get(MAX_ID_KEY) or 0
 
   getUsers = () ->
     return robot.brain.get(USERS_KEY) or []
 
   setUser = (user_info) ->
-    user_info["id"] = getMaxId()+1
+    user_info["id"] = uuid.generate()
     users = getUsers()
     users.push(user_info)
     console.log(users)
@@ -32,4 +30,3 @@ module.exports = (robot) ->
     }
     setUser(user_info)
     msg.send "save!!"
-
