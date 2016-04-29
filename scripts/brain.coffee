@@ -10,12 +10,10 @@ module.exports = (robot) ->
     user_info["id"] = uuid.generate()
     users = getUsers()
     users.push(user_info)
-    console.log(users)
     robot.brain.set(USERS_KEY, users)
 
   robot.respond /list/i, (msg) ->
     users = getUsers()
-    console.log(users)
     users.forEach((user) ->
       name = user["name"]
       msg.send "id:#{user["id"]} : name:#{user["name"]} : grade:#{user["grade"]}"
@@ -29,4 +27,4 @@ module.exports = (robot) ->
       "grade": grade
     }
     setUser(user_info)
-    msg.send "save!!"
+    msg.send "save #{name} as #{grade}"
