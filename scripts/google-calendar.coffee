@@ -9,7 +9,7 @@ TOKEN_DIR = (process.env.HOME or process.env.HOMEPATH or process.env.USERPROFILE
 TOKEN_PATH = TOKEN_DIR + 'calendar-api-quickstart.json'
 auth = require("./auth.json")
 
-authorize = (robot) ->
+exports.authorize = (robot) ->
   clientSecret = auth["clientSecret"]
   clientId = auth["clientId"]
   redirectUrl = "https://www.google.co.jp/"
@@ -56,7 +56,7 @@ storeToken = (token) ->
   console.log 'Token stored to ' + TOKEN_PATH
   return
 
-getEvents = (auth, tags) ->
+exports.getEvents = (auth, tags) ->
   moment.locale('ja')
   calendar.events.list {
     auth: auth
@@ -85,14 +85,6 @@ getEvents = (auth, tags) ->
           else
             events[date]=[summary]
       return events
-    return
-  return
+    return null
+  return null
 
-
-# hubot部分
-module.exports = (robot) ->
-  robot.respond /hello/i, (msg) ->
-    auth = authorize(robot)
-    unless auth?
-      msg.send "no"
-    console.log(getEvents(auth, ["clean"]))
