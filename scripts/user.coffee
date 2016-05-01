@@ -48,3 +48,10 @@ remove = (id, robot) ->
   robot.brain.set(USERS_KEY, users)
   return
 exports.remove = remove
+
+getIndexBy = (id, users) ->
+  for user, index in users
+    if user["id"] == id
+      return index
+  return null
+exports.getIndexBy = getIndexBy
