@@ -1,7 +1,7 @@
 Helper = require('hubot-test-helper')
 expect = require('chai').expect
 
-helper = new Helper('./../scripts/brain.coffee')
+helper = new Helper('./../scripts/gomi-man.coffee')
 
 describe 'save user', ->
   room = null
