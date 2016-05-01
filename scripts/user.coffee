@@ -49,9 +49,16 @@ remove = (id, robot) ->
   return
 exports.remove = remove
 
-getIndexBy = (id, users) ->
+getIndexById = (id, users) ->
   for user, index in users
     if user["id"] == id
       return index
   return null
-exports.getIndexBy = getIndexBy
+exports.getIndexById = getIndexById
+
+getIndexByName = (name, users) ->
+  for user, index in users
+    if user["name"] == name
+      return index
+  return null
+exports.getIndexByName = getIndexByName
