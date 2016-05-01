@@ -19,7 +19,7 @@ describe 'ユーザを保存する', ->
       room.user.say 'ken', 'hubot save me as M3'
       room.user.say 'sayuri', 'hubot save me as '
 
-    it 'should give notice of saved information', ->
+    it '保存されたことを通知する', ->
       expect(room.messages).to.eql [
         ['alice', 'hubot save me as B4']
         ['bob', 'hubot save me as M1']
@@ -28,3 +28,4 @@ describe 'ユーザを保存する', ->
         ['hubot', 'save alice as B4']
         ['hubot', 'save bob as M1']
       ]
+
