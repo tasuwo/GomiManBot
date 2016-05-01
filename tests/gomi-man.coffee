@@ -3,7 +3,7 @@ expect = require('chai').expect
 
 helper = new Helper('./../scripts/gomi-man.coffee')
 
-describe 'save user', ->
+describe 'ユーザを保存する', ->
   room = null
 
   beforeEach ->
@@ -12,7 +12,7 @@ describe 'save user', ->
   afterEach ->
     room.destroy()
 
-  context 'user save user\'s own information in hubot\'s brain', ->
+  context 'ユーザ自身の呼びかけにより，brainにユーザ情報を保持し，結果を返す', ->
     beforeEach ->
       room.user.say 'alice', 'hubot save me as B4'
       room.user.say 'bob', 'hubot save me as M1'
