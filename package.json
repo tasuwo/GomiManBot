@@ -5,6 +5,11 @@
   "author": "tasuwo <kamuhata.you@gmail.com>",
   "description": "A simple robot for selab team",
   "dependencies": {
+    "async": "^1.5.2",
+    "co": "^4.6.0",
+    "cron": "^1.1.0",
+    "google-auth-library": "^0.9.7",
+    "googleapis": "^5.2.1",
     "hubot": "^2.18.0",
     "hubot-diagnostics": "0.0.1",
     "hubot-google-images": "^0.2.6",
@@ -18,7 +23,9 @@
     "hubot-scripts": "^2.16.2",
     "hubot-shipit": "^0.2.0",
     "hubot-slack": "^3.4.2",
-    "cron": ">= 1.0.4"
+    "cron": ">= 1.0.4",
+    "moment": "^2.13.0",
+    "time": "^0.11.4"
   },
   "engines": {
     "node": "0.10.x"
@@ -31,6 +38,6 @@
     "mocha": "^2.4.5"
   },
   "scripts": {
-    "test": "mocha --compilers coffee:coffee-script/register tests"
+    "test": "mocha --compilers coffee:coffee-script/register --harmony-generators tests"
   }
 }
