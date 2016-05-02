@@ -24,7 +24,7 @@ set = (user_info, robot) ->
 exports.set = set
 
 update = (id, prop, value, robot) ->
-  info = getAll(id, robot)
+  info = get(id, robot)
   if info == null
     return null
   user = info[0]
@@ -32,7 +32,7 @@ update = (id, prop, value, robot) ->
   # TODO: prop がないかどうかの判断
   # if prop in user
   user[prop] = value
-  users = getAll()
+  users = getAll(robot)
   users[index] = user
   robot.brain.set(USERS_KEY, users)
   return
