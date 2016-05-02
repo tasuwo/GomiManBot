@@ -2,7 +2,7 @@
 #   Utility commands surrounding Hubot uptime.
 
 calendar = require("./google-calendar.coffee")
-assign = require("./assignment.coffee")
+scheduler = require("./scheduler.coffee")
 user = require("./user.coffee")
 async = require("async")
 DUTY_ROSTER_KEY = 'duty_roster_key'
@@ -28,10 +28,10 @@ module.exports = (robot) ->
       )
     , (dates, callback) ->
       users        = user.getAll(robot)
-      lastUserName = assign.getLastAssignedUserName(robot) or users[0]["name"]
-      assigns      = assign.assign(users, dates, lastUserName)
+      lastUserName = scheduler.getLastAssignedUserName(robot) or users[0]["name"]
+      assigns      = scheduler.assign(users, dates, lastUserName)
       robot.brain.set(DUTY_ROSTER_KEY, assigns)
-      assign.setLastAssignedUserName(assigns[assigns.length-1]["assign"],robot)
+      scheduler.setLastAssignedUserName(assigns[assigns.length-1]["assign"],robot)
       callback null, assigns
     , (assigns, err, val) ->
       msg.send "Some members were assigned to duty roster!"

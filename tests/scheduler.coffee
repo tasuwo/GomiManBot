@@ -4,7 +4,7 @@ expect = chai.expect
 chai.should()
 # add should method to Object.prototype
 
-assignment = require('./../scripts/assignment.coffee')
+scheduler = require('./../scripts/scheduler.coffee')
 
 describe '掃除当番メンバーの取得',->
   users = null
@@ -24,21 +24,21 @@ describe '掃除当番メンバーの取得',->
     }
 
   it "当番が巡回しない場合", ->
-    members = assignment.extractDutyMembers(0,3,users)
+    members = scheduler.extractDutyMembers(0,3,users)
     expect(members.length == 3).be.true
     expect(members[0]["id"]=="a").be.true
     expect(members[1]["id"]=="b").be.true
     expect(members[2]["id"]=="c").be.true
 
   it "当番が一巡する場合", ->
-    members = assignment.extractDutyMembers(1,3,users)
+    members = scheduler.extractDutyMembers(1,3,users)
     expect(members.length == 3).be.true
     expect(members[0]["id"]=="b").be.true
     expect(members[1]["id"]=="c").be.true
     expect(members[2]["id"]=="a").be.true
 
   it "当番が複数回巡回する場合", ->
-    members = assignment.extractDutyMembers(1,6,users)
+    members = scheduler.extractDutyMembers(1,6,users)
     expect(members[0]["id"]=="b").be.true
     expect(members[1]["id"]=="c").be.true
     expect(members[2]["id"]=="a").be.true
@@ -47,7 +47,7 @@ describe '掃除当番メンバーの取得',->
     expect(members[5]["id"]=="a").be.true
 
   it "ユーザに当番を割り当てる(最初のメンバーから割り当て)", ->
-    assign = assignment.assign(users, dates, users[2]["name"])
+    assign = scheduler.assign(users, dates, users[2]["name"])
     expect(assign.length==4).be.true
     expect(assign[0]["date"]=="2016-04-01").be.true
     expect(assign[1]["date"]=="2016-04-10").be.true
@@ -59,7 +59,7 @@ describe '掃除当番メンバーの取得',->
     expect(assign[3]["assign"]=="tasuwo").be.true
 
   it "ユーザに当番を割り当てる(途中のメンバーから割り当て)", ->
-    assign = assignment.assign(users, dates, users[0]["name"])
+    assign = scheduler.assign(users, dates, users[0]["name"])
     expect(assign.length==4).be.true
     expect(assign[0]["date"]=="2016-04-01").be.true
     expect(assign[1]["date"]=="2016-04-10").be.true
