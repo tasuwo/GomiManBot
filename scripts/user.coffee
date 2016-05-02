@@ -3,6 +3,30 @@ uuid = require "./uuid.coffee"
 USERS_KEY = 'users'
 
 
+sortUsersByGrade = (users) ->
+  unless users?
+    throw Error "Users are empty"
+  sortedUsers = []
+  b4 = []
+  m1 = []
+  m2 = []
+  for user in users
+    switch user["grade"]
+      when "B4"
+        b4.push(user)
+      when "M1"
+        m1.push(user)
+      when "M2"
+        m2.push(user)
+      else
+        throw Error "Invalid user in users"
+  Array.prototype.push.apply(sortedUsers, b4)
+  Array.prototype.push.apply(sortedUsers, m1)
+  Array.prototype.push.apply(sortedUsers, m2)
+  return sortedUsers
+exports.sortUsersByGrade = sortUsersByGrade
+
+
 getAll = (robot) ->
   return robot.brain.get(USERS_KEY) or null
 exports.getAll = getAll
@@ -26,7 +50,7 @@ set = (user_info, robot) ->
 
   users = getAll(robot) or []
   users.push(user_info)
-  robot.brain.set(USERS_KEY, users)
+  robot.brain.set(USERS_KEY, sortUsersByGrade(users))
 exports.set = set
 
 
@@ -43,7 +67,7 @@ update = (name, prop, value, robot) ->
 
   users = getAll(robot)
   users[index] = user
-  robot.brain.set(USERS_KEY, users)
+  robot.brain.set(USERS_KEY, sortUsersByGrade(users))
 exports.update = update
 
 
@@ -55,7 +79,10 @@ remove = (name, robot) ->
 
   users = getAll(robot)
   delete users.splice(index,1)
-  if users.length == 0 then users = null
+  if users.length == 0
+    users = null
+  else
+    users = sortUsersByGrade(users)
   robot.brain.set(USERS_KEY, users)
 exports.remove = remove
 
