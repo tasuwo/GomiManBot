@@ -9,9 +9,9 @@ describe 'ユーザデータに対する操作',->
 
   before ->
     users = [
-      {"id":"a", "name":"tasuwo", "grade":"M1"},
-      {"id":"b", "name":"tozawa", "grade":"M2"},
-      {"id":"c", "name":"tetsuwo", "grade":"B4"}
+      {"name":"tasuwo", "grade":"M1"},
+      {"name":"tozawa", "grade":"M2"},
+      {"name":"tetsuwo", "grade":"B4"}
     ]
 
   it "名前からインデックスを取得する", ->
