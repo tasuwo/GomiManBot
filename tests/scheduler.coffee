@@ -27,7 +27,7 @@ describe '掃除当番のスケジューラ',->
     る', ->
     it "当番人数 <= 全メンバー数 であり，割り当てが先頭のメンバーに戻
     らない場合", ->
-      members = scheduler.extractDutyMembers(0,3,users)
+      members = scheduler.decideMembersForAssignment(0,3,users)
       expect(members.length == 3).be.true
       expect(members[0]["name"]=="tasuwo").be.true
       expect(members[1]["name"]=="tozawa").be.true
@@ -35,20 +35,25 @@ describe '掃除当番のスケジューラ',->
 
     it "当番人数 <= 全メンバー数 であり，割り当てが先頭のメンバーに戻
       る場合", ->
-      members = scheduler.extractDutyMembers(1,3,users)
+      members = scheduler.decideMembersForAssignment(1,3,users)
       expect(members.length == 3).be.true
       expect(members[0]["name"]=="tozawa").be.true
       expect(members[1]["name"]=="tetsuwo").be.true
       expect(members[2]["name"]=="tasuwo").be.true
 
     it "当番人数 > 全メンバー数 である場合", ->
-      members = scheduler.extractDutyMembers(1,6,users)
+      members = scheduler.decideMembersForAssignment(1,6,users)
       expect(members[0]["name"]=="tozawa").be.true
       expect(members[1]["name"]=="tetsuwo").be.true
       expect(members[2]["name"]=="tasuwo").be.true
       expect(members[3]["name"]=="tozawa").be.true
       expect(members[4]["name"]=="tetsuwo").be.true
       expect(members[5]["name"]=="tasuwo").be.true
+
+    it '不正な引数が与えられた場合は例外を発生させる', ->
+      expect(scheduler.decideMembersForAssignment.bind(scheduler,-1,3,users)).to.throw(Error)
+      expect(scheduler.decideMembersForAssignment.bind(scheduler,1,-1,users)).to.throw(Error)
+      expect(scheduler.decideMembersForAssignment.bind(scheduler,1,-1,null)).to.throw(Error)
 
   context '日程へのメンバーの割り当て', ->
     it "ユーザに当番を割り当てる(先頭のメンバーから割り当て)", ->
@@ -74,3 +79,7 @@ describe '掃除当番のスケジューラ',->
       expect(assign[1]["assign"]=="tetsuwo").be.true
       expect(assign[2]["assign"]=="tasuwo").be.true
       expect(assign[3]["assign"]=="tozawa").be.true
+
+    it "不正な引数が与えられた場合には例外を発生させる", ->
+      expect(scheduler.assign.bind(scheduler, [], dates, users[0]["name"])).to.throw(Error)
+      expect(scheduler.assign.bind(scheduler, users, [], users[0]["name"])).to.throw(Error)
