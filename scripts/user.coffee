@@ -2,59 +2,63 @@ uuid = require "./uuid.coffee"
 
 USERS_KEY = 'users'
 
+
 getAll = (robot) ->
-  return robot.brain.get(USERS_KEY) or []
+  return robot.brain.get(USERS_KEY) or null
 exports.getAll = getAll
 
-get = (id, robot) ->
-  users = getAll(robot)
+
+getByName = (name, robot) ->
   result = null
-  users.forEach((user, index) ->
-    if id == user["id"]
-      result = [user, index]
-  )
+  users = getAll(robot)
+  if users?
+    users.forEach((user, index) ->
+      if name == user["name"]
+        result = [user, index]
+    )
   return result
-exports.get = get
+exports.getByName = getByName
+
 
 set = (user_info, robot) ->
-  user_info["id"] = uuid.generate()
-  users = getAll(robot)
+  if getByName(user_info["name"], robot)?
+    throw Error "User name is duplicate"
+
+  users = getAll(robot) or []
   users.push(user_info)
   robot.brain.set(USERS_KEY, users)
 exports.set = set
 
-update = (id, prop, value, robot) ->
-  info = get(id, robot)
-  if info == null
-    return null
-  user = info[0]
-  index = info[1]
-  # TODO: prop がないかどうかの判断
-  # if prop in user
+
+update = (name, prop, value, robot) ->
+  update_user_info = getByName(name, robot)
+  user  = update_user_info[0]
+  index = update_user_info[1]
+  if prop=="name" && getByName(value, robot)?
+    throw Error "User name is duplicate"
+
+  unless user[prop]?
+    throw Error "Assigned property doesn't exist"
   user[prop] = value
+
   users = getAll(robot)
   users[index] = user
   robot.brain.set(USERS_KEY, users)
-  return
-  # return null
 exports.update = update
 
-remove = (id, robot) ->
-  info = get(id, robot)
-  if info == null
-    return null
+
+remove = (name, robot) ->
+  remove_user_info = getByName(name, robot)
+  unless remove_user_info?
+    throw Error "Assigned user name doesn't exist"
+  index = remove_user_info[1]
+
   users = getAll(robot)
-  delete users[info[1]]
+  delete users.splice(index,1)
+  if users.length == 0 then users = null
   robot.brain.set(USERS_KEY, users)
-  return
 exports.remove = remove
 
-getIndexById = (id, users) ->
-  for user, index in users
-    if user["id"] == id
-      return index
-  return null
-exports.getIndexById = getIndexById
 
 getIndexByName = (name, users) ->
   for user, index in users
