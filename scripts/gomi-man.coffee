@@ -6,10 +6,21 @@ scheduler = require("./scheduler.coffee")
 user = require("./user.coffee")
 async = require("async")
 ASSIGNMENTS_KEY = 'assignments_key'
+LAST_ASSIGNED_MONTH = 'last_assigned_month'
+
+showAssignmentsList = (msg, robot) ->
+  assignments = robot.brain.get(ASSIGNMENTS_KEY) or null
+  unless assignments?
+    msg.send "There are no assignments. Please
+    assign users to duty by `assign members` command."
+    return
+  for assignment in assignments
+    date = assignment["date"]
+    duty = assignment["duty"]
+    assign = assignment["assign"]
+    msg.send "date:#{date}, duty:#{duty}, assign:#{assign}"
 
 module.exports = (robot) ->
-
-
   robot.respond /assign/i, (msg) ->
     async.waterfall [
       (callback) ->
@@ -27,12 +38,23 @@ module.exports = (robot) ->
           callback null, dates
       )
     , (dates, callback) ->
+      keys = Object.keys(dates)
+      thisMonth       = keys[0].split("-")[0]
+      willAssignMonth = robot.brain.get(LAST_ASSIGNED_MONTH) or ""
+      if thisMonth == willAssignMonth
+        msg.send "Assignment of this month has perfomed as follows"
+        showAssignmentsList msg, robot
+        return
+
       users        = user.getAll(robot)
       lastUserName = scheduler.getLastAssignedUserName(robot) or users[0]["name"]
       try
         assignments  = scheduler.assign(users, dates, lastUserName)
+
         robot.brain.set(ASSIGNMENTS_KEY, assignments)
         scheduler.setLastAssignedUserName(assignments[assignments.length-1]["assign"],robot)
+        robot.brain.set(LAST_ASSIGNED_MONTH, thisMonth)
+
         callback null, assignments
       catch error
         throw Error error
@@ -48,12 +70,7 @@ module.exports = (robot) ->
 
 
   robot.respond /assign list/i, (msg) ->
-    assignments = robot.brain.get(ASSIGNMENTS_KEY) or null
-    unless assignments?
-      msg.send "There are no assignments. Please
-    assign users to duty by `assign members` command."
-      return
-    msg.send assignments
+    showAssignmentsList msg, robot
 
 
   robot.respond /users list/i, (msg) ->
