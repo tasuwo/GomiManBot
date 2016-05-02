@@ -1,20 +1,15 @@
 # Description:
 #   Utility commands surrounding Hubot uptime.
-#
-# Commands:
-#   hubot ping - Reply with pong
-#   hubot echo <text> - Reply back with <text>
-#   hubot time - Reply with current time
-#   hubot die - End hubot process
 
 calendar = require("./google-calendar.coffee")
 assign = require("./assignment.coffee")
 user = require("./user.coffee")
 async = require("async")
+DUTY_ROSTER_KEY = 'duty_roster_key'
 
 module.exports = (robot) ->
 
-  robot.respond /duty roster/i, (msg) ->
+  robot.respond /assign members/i, (msg) ->
     async.waterfall [
       (callback) ->
         calendar.authorize(robot,
@@ -34,11 +29,22 @@ module.exports = (robot) ->
       users        = user.getAll(robot)
       lastUserName = assign.getLastAssignedUserName(robot) or users[0]["name"]
       assigns      = assign.assign(users, dates, lastUserName)
-      console.log(assigns)
+      robot.brain.set(DUTY_ROSTER_KEY, assigns)
       assign.setLastAssignedUserName(assigns[assigns.length-1]["assign"],robot)
-    , (err, val) ->
+      callback null, assigns
+    , (assigns, err, val) ->
+      msg.send "Some members were assigned to duty roster!"
+      msg.send assigns
       return
     ]
+
+  robot.respond /show duty roster/i, (msg) ->
+    duty_roster = robot.brain.get(DUTY_ROSTER_KEY) or null
+    unless duty_roster?
+      msg.send "No members were assigned. Please
+    assign members to duty roster by `assign members` command."
+      return
+    msg.send duty_roster
 
   robot.respond /list/i, (msg) ->
     users = user.getAll(robot)
