@@ -6,6 +6,7 @@
   "description": "A simple robot for selab team",
   "dependencies": {
     "async": "^1.5.2",
+    "co": "^4.6.0",
     "cron": "^1.1.0",
     "google-auth-library": "^0.9.7",
     "googleapis": "^5.2.1",
@@ -36,6 +37,6 @@
     "mocha": "^2.4.5"
   },
   "scripts": {
-    "test": "mocha --compilers coffee:coffee-script/register tests"
+    "test": "mocha --compilers coffee:coffee-script/register --harmony-generators tests"
   }
 }
