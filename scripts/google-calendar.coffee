@@ -85,6 +85,7 @@ exports.getEvents = (auth, tags, callback) ->
           else
             events[date]=[summary]
       callback null, events
-    , (events, err, res) ->
-      callback events
-  ]
+  ], (err, events) ->
+    if err
+      throw Error err
+    callback events

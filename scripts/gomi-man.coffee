@@ -5,12 +5,12 @@ calendar = require("./google-calendar.coffee")
 scheduler = require("./scheduler.coffee")
 user = require("./user.coffee")
 async = require("async")
-DUTY_ROSTER_KEY = 'duty_roster_key'
+ASSIGNMENTS_KEY = 'assignments_key'
 
 module.exports = (robot) ->
 
 
-  robot.respond /assign members/i, (msg) ->
+  robot.respond /assign/i, (msg) ->
     async.waterfall [
       (callback) ->
         calendar.authorize(robot,
@@ -29,24 +29,31 @@ module.exports = (robot) ->
     , (dates, callback) ->
       users        = user.getAll(robot)
       lastUserName = scheduler.getLastAssignedUserName(robot) or users[0]["name"]
-      assigns      = scheduler.assign(users, dates, lastUserName)
-      robot.brain.set(DUTY_ROSTER_KEY, assigns)
-      scheduler.setLastAssignedUserName(assigns[assigns.length-1]["assign"],robot)
-      callback null, assigns
-    , (assigns, err, val) ->
-      msg.send "Some members were assigned to duty roster!"
-      msg.send assigns
-      return
-    ]
+      try
+        assignments  = scheduler.assign(users, dates, lastUserName)
+        robot.brain.set(ASSIGNMENTS_KEY, assignments)
+        scheduler.setLastAssignedUserName(assignments[assignments.length-1]["assign"],robot)
+        callback null, assignments
+      catch error
+        throw Error error
+    ], (err, assignments) ->
+      if err
+        msg.send "#{err}"
+      msg.send "Some members were assigned to duty as follows!"
+      for assignment in assignments
+        date = assignment["date"]
+        duty = assignment["duty"]
+        assign = assignment["assign"]
+        msg.send "date:#{date}, duty:#{duty}, assign:#{assign}"
 
 
-  robot.respond /show duty roster/i, (msg) ->
-    duty_roster = robot.brain.get(DUTY_ROSTER_KEY) or null
-    unless duty_roster?
-      msg.send "No members were assigned. Please
-    assign members to duty roster by `assign members` command."
+  robot.respond /assign list/i, (msg) ->
+    assignments = robot.brain.get(ASSIGNMENTS_KEY) or null
+    unless assignments?
+      msg.send "There are no assignments. Please
+    assign users to duty by `assign members` command."
       return
-    msg.send duty_roster
+    msg.send assignments
 
 
   robot.respond /users list/i, (msg) ->
