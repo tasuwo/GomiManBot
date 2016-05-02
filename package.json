@@ -5,6 +5,7 @@
   "author": "tasuwo <kamuhata.you@gmail.com>",
   "description": "A simple robot for selab team",
   "dependencies": {
+    "async": "^1.5.2",
     "cron": "^1.1.0",
     "google-auth-library": "^0.9.7",
     "googleapis": "^5.2.1",

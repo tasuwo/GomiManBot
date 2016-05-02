@@ -1,14 +1,44 @@
+# Description:
+#   Utility commands surrounding Hubot uptime.
+#
+# Commands:
+#   hubot ping - Reply with pong
+#   hubot echo <text> - Reply back with <text>
+#   hubot time - Reply with current time
+#   hubot die - End hubot process
+
 calendar = require("./google-calendar.coffee")
+assign = require("./assignment.coffee")
 user = require("./user.coffee")
+async = require("async")
 
 module.exports = (robot) ->
 
   robot.respond /duty roster/i, (msg) ->
-    auth = calendar.authorize(robot)
-    unless auth?
-      msg.send "Error occured"
+    async.waterfall [
+      (callback) ->
+        calendar.authorize(robot,
+          (oauth2Client) ->
+            callback null, oauth2Client
+        )
+        return
+    , (auth, callback) ->
+      unless auth?
+        msg.send "Error occured"
+        return
+      calendar.getEvents(auth, ["clean"],
+        (dates) ->
+          callback null, dates
+      )
+    , (dates, callback) ->
+      users        = user.getAll(robot)
+      lastUserName = assign.getLastAssignedUserName(robot) or users[0]["name"]
+      assigns      = assign.assign(users, dates, lastUserName)
+      console.log(assigns)
+      assign.setLastAssignedUserName(assigns[assigns.length-1]["assign"],robot)
+    , (err, val) ->
       return
-    console.log(calendar.getEvents(auth, ["clean"]))
+    ]
 
   robot.respond /list/i, (msg) ->
     users = user.getAll(robot)
