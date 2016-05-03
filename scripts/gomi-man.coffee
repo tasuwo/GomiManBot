@@ -9,9 +9,13 @@ cron = require("./cron.coffee")
 as = require("./assignment.coffee")
 
 module.exports = (robot) ->
+  cron.startJobs(robot, "test")
+
   robot.respond /assign/i, (msg) ->
     try
-      as.assign(robot, (messages) ->
+      as.assign(robot, (messages, err) ->
+        if err
+          msg.send err; return
         for message in messages
           msg.send message
       )

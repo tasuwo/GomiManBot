@@ -58,10 +58,10 @@ assign = (robot, _callback) ->
     callback null, assignments, "", false
   ], (err, assignments, message, preStoredflg) ->
     if err
-      console.log(err); return
+      _callback null, err; return
 
     if preStoredflg
-      _callback message
+      _callback message, null
     else
       msg = []
       msg.push "Some members were assigned to duty as follows!"
@@ -70,5 +70,5 @@ assign = (robot, _callback) ->
         duty   = assignment["duty"]
         member = assignment["assign"]
         msg.push "date:#{date}, duty:#{duty}, member:#{member}"
-      _callback msg
+      _callback msg, null
 exports.assign = assign

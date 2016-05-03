@@ -1,4 +1,4 @@
-gomi_man = require('./gomi-man.coffee')
+as = require('./assignment.coffee')
 cronJob = require('cron').CronJob
 
 translateDateToCronSetting = (date) ->
@@ -27,25 +27,26 @@ exports.startJobs = (robot, channnel) ->
 
   new cronJob('0 0 12 1 */1 *', (channel) =>
     envelope = room: channel
-    try
-      messages = [ "@channel Check!" ]
-      gomi_man.assign(robot, (resultMsgs) ->
-        for resultMsg in resultMsgs
-          msg.push resultMsg
-      )
+    messages = [ "@channel Check!" ]
+    as.assign(robot, (resultMsgs, err) ->
+      if err
+        robot.send envelope, "Error: " + err + ", so cannnot extcute cron job"; return
+      for resultMsg in resultMsgs
+        messages.push resultMsg
       for message in messages
-        robot.send envelope, message
-    catch error
+          robot.send envelope, message
+    )
 
     if childJobs.length > 0
       for job in childJobs
         job.stop()
+      childJobs = []
 
-    assignments = gomi_man.getAssignmentsList(robot)
+    assignments = as.getAssignmentsList(robot)
     if assignments?
       for assignment in assignments
         assignedDate = translateDateToCronSetting(assignment["date"])
-        notifiedDate = decideMembersForAssignment(assignedDate)
+        notifiedDate = decrementDayOfCronSetting(assignedDate)
         childJobs.push(
           new cronJob(notifiedDate, () =>
             robot.send envelope, "@"+assignment["name"]+" You are
