@@ -11,6 +11,17 @@ as = require("./assignment.coffee")
 module.exports = (robot) ->
   cron.startJobs(robot, "test")
 
+  robot.respond /get auth url/i, (msg) ->
+    msg.send do calendar.getAuthUrlMsg
+
+  robot.respond /auth with (.+)/i, (msg) ->
+    code = msg.match[0].split(" ")[3]
+    calendar.getNewToken code, (res, err) ->
+      if err
+        msg.send err; return
+      msg.send res
+    , robot
+
   robot.respond /assign/i, (msg) ->
     try
       as.assign(robot, (messages, err) ->

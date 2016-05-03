@@ -26,7 +26,9 @@ getAssignmentsListMsg = (robot) ->
 assign = (robot, _callback) ->
   async.waterfall [
     (callback) ->
-      calendar.authorize(robot, (oauth2Client) ->
+      calendar.authorize(robot, (oauth2Client, err) ->
+        if err?
+          callback err; return
         callback null, oauth2Client
       )
   , (auth, callback) ->

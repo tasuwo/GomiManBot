@@ -11,6 +11,7 @@ REDIRECT_URL  = "http://google.co.jp/"
 oauth2Client = new OAuth2(CLIENT_ID, CLIENT_SECRET, REDIRECT_URL)
 calendar = google.calendar({version: 'v3', auth: oauth2Client})
 SCOPES = [ 'https://www.googleapis.com/auth/calendar.readonly' ]
+
 TOKEN_DIR = (process.env.HOME or process.env.HOMEPATH or process.env.USERPROFILE) + '/.credentials/'
 TOKEN_PATH = TOKEN_DIR + 'calendar-api-quickstart.json'
 
@@ -19,39 +20,42 @@ async = require("async")
 exports.authorize = (robot, callback) ->
   fs.readFile TOKEN_PATH, (err, token) ->
     if err
-      getNewToken oauth2Client, callback, robot
-    else
-      oauth2Client.setCredentials(JSON.parse(token))
-      callback oauth2Client
+      callback null, "Not yet store auth token. Please get url by
+  `get auth url` command and enter code with `auth with <code>`"; return
 
-getNewToken = (oauth2Client, callback, robot) ->
+    oauth2Client.setCredentials(JSON.parse(token))
+    callback oauth2Client, null
+
+getAuthUrlMsg = () ->
   authUrl = oauth2Client.generateAuthUrl(
     access_type: 'offline'
-    scope: SCOPES)
-  console.log 'Authorize this app by visiting this url: ', authUrl
-  rl = readline.createInterface(
-    input: process.stdin
-    output: process.stdout
+    scope: SCOPES
   )
-  rl.question 'Enter the code from that page here: ', (code) ->
-    rl.close()
-    oauth2Client.getToken code, (err, token) ->
-      if err
-        console.log 'Error while trying to retrieve access token', err
-        return
-      oauth2Client.setCredentials(token)
+  return 'Authorize this app by visiting this url: ' + authUrl +
+    '\nAfter vissiting the url, you have been provided the redirect
+    URL with a code query parameter. Next, please get and store token
+     by `auth with <code>` command.'
+exports.getAuthUrlMsg = getAuthUrlMsg
+
+getNewToken = (code, callback, robot) ->
+  oauth2Client.getToken code, (err, token) ->
+    if err
+      callback null, 'Error while trying to retrieve access token:' + err; return
+    oauth2Client.setCredentials(token)
+    try
       storeToken token
-      callback oauth2Client
+    catch err
+      callback null, 'Error while trying to retrieve access token:' + err; return
+    callback 'Authorize information was saved!', null
+exports.getNewToken = getNewToken
 
 storeToken = (token) ->
   try
     fs.mkdirSync TOKEN_DIR
   catch err
-    if err.code != 'EEXIST'
-      throw err
+    if err.code != 'EEXIST' then throw err
   fs.writeFile TOKEN_PATH, JSON.stringify(token)
   console.log 'Token stored to ' + TOKEN_PATH
-  return
 
 exports.getEvents = (auth, tags, callback) ->
   moment.locale('ja')
