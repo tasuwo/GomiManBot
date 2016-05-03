@@ -46,7 +46,7 @@ exports.startJobs = (robot, channnel) ->
       for job in childJobs
         job.stop()
 
-    assignments = getAssignmentsList(robot)
+    assignments = gomi_man.getAssignmentsList(robot)
     if assignments?
       for assignment in assignments
         assignedDate = translateDateToCronSetting(assignment["date"])
