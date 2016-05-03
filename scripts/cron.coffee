@@ -1,3 +1,4 @@
+gomi_man = require('./gomi-man.coffee')
 cronJob = require('cron').CronJob
 
 translateDateToCronSetting = (date) ->
@@ -26,13 +27,37 @@ decrementDayOfCronSetting = (cronSetting) ->
   return settings.join(" ")
 exports.decrementDayOfCronSetting = decrementDayOfCronSetting
 
-# module.exports = (robot) ->
-#   # 月のはじめに assign する
-#   eachMonthJob = new cronJob('0 12 1 */1 * *', () =>
-#     envelope = room: "#chireiden"
-#     robot.send envelope, "@channel ゴミだせ"
-#   )
-#   eachMonthJob.start()
+exports.startJobs = (robot, channnel) ->
+  childJobs = []
 
-#   # 前日にユーザに通知する
-  
+  new cronJob('0 12 1 */1 * *', (channel) =>
+    envelope = room: channel
+    try
+      messages = [ "@channel Check!" ]
+      gomi_man.assign(robot, (resultMsgs) ->
+        for resultMsg in resultMsgs
+          msg.push resultMsg
+      )
+      for message in messages
+        robot.send envelope, message
+    catch error
+
+    if childJobs.length > 0
+      for job in childJobs
+        job.stop()
+
+    assignments = getAssignmentsList(robot)
+    if assignments?
+      for assignment in assignments
+        assignedDate = translateDateToCronSetting(assignment["date"])
+        notifiedDate = decideMembersForAssignment(assignedDate)
+        childJobs.push(
+          new cronJob(notifiedDate, () =>
+            robot.send envelope, "@"+assignment["name"]+" You are
+            assigned to duty in tommorow"
+          )
+        )
+      for job in childJobs
+        job.start()
+  ).start()
+
