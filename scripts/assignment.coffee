@@ -26,18 +26,16 @@ getAssignmentsListMsg = (robot) ->
 assign = (robot, _callback) ->
   async.waterfall [
     (callback) ->
-      calendar.authorize(robot,
-        (oauth2Client) ->
-          callback null, oauth2Client
+      calendar.authorize(robot, (oauth2Client) ->
+        callback null, oauth2Client
       )
-      return
   , (auth, callback) ->
     unless auth?
-      throw Error "Failed to authorize API"
+      callback "Failed to authorize API"; return
     calendar.getEvents(auth, ["clean"], (dates) -> callback null, dates)
   , (dates, callback) ->
     unless dates?
-      throw Error "There are no events on calendar for assignment"
+      callback "There are no events on calendar for assignment"; return
     keys            = Object.keys(dates)
     thisMonth       = keys[0].split("-")[0]
     willAssignMonth = robot.brain.get(LAST_ASSIGNED_MONTH) or ""
@@ -45,26 +43,22 @@ assign = (robot, _callback) ->
       msg = []
       msg.push "Assignment of this month has perfomed as follows"
       Array.prototype.push.apply(msg, getAssignmentsListMsg(robot))
-      callback null, [], msg, true
-      return
+      callback null, [], msg, true; return
 
     users = user.getAll(robot)
     unless users?
-      throw Error "There are no users for assignment"
+      callback "There are no users for assignment"; return
     lastUserName = scheduler.getLastAssignedUserName(robot) or users[0]["name"]
-    try
-      assignments  = scheduler.assign(users, dates, lastUserName)
+    assignments  = scheduler.assign(users, dates, lastUserName)
 
-      robot.brain.set(ASSIGNMENTS_KEY, assignments)
-      scheduler.setLastAssignedUserName(assignments[assignments.length-1]["assign"],robot)
-      robot.brain.set(LAST_ASSIGNED_MONTH, thisMonth)
+    robot.brain.set(ASSIGNMENTS_KEY, assignments)
+    scheduler.setLastAssignedUserName(assignments[assignments.length-1]["assign"],robot)
+    robot.brain.set(LAST_ASSIGNED_MONTH, thisMonth)
 
-      callback null, assignments, "", false
-    catch error
-      throw Error error
+    callback null, assignments, "", false
   ], (err, assignments, message, preStoredflg) ->
     if err
-      throw Error error
+      console.log(err); return
 
     if preStoredflg
       _callback message
