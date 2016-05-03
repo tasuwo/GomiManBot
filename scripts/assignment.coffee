@@ -36,6 +36,8 @@ assign = (robot, _callback) ->
       throw Error "Failed to authorize API"
     calendar.getEvents(auth, ["clean"], (dates) -> callback null, dates)
   , (dates, callback) ->
+    unless dates?
+      throw Error "There are no events on calendar for assignment"
     keys            = Object.keys(dates)
     thisMonth       = keys[0].split("-")[0]
     willAssignMonth = robot.brain.get(LAST_ASSIGNED_MONTH) or ""
@@ -46,7 +48,9 @@ assign = (robot, _callback) ->
       callback null, [], msg, true
       return
 
-    users        = user.getAll(robot)
+    users = user.getAll(robot)
+    unless users?
+      throw Error "There are no users for assignment"
     lastUserName = scheduler.getLastAssignedUserName(robot) or users[0]["name"]
     try
       assignments  = scheduler.assign(users, dates, lastUserName)
