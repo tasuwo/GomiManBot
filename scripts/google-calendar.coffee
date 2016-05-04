@@ -21,7 +21,7 @@ exports.authorize = (robot, callback) ->
   fs.readFile TOKEN_PATH, (err, token) ->
     if err
       callback null, "Not yet store auth token. Please get url by
-  `get auth url` command and enter code with `auth with <code>`"; return
+  `auth get url` command and enter code with `auth with <code>`"; return
 
     oauth2Client.setCredentials(JSON.parse(token))
     callback oauth2Client, null
@@ -32,9 +32,9 @@ getAuthUrlMsg = () ->
     scope: SCOPES
   )
   return 'Authorize this app by visiting this url: ' + authUrl +
-    '\nAfter vissiting the url, you have been provided the redirect
-    URL with a code query parameter. Next, please get and store token
-     by `auth with <code>` command.'
+    '\nAfter vissiting the url, you will be able to retrive a code
+  query parameter from the redirect url. Next, use it and retrive
+  access token, save it by `auth with <code>` command.'
 exports.getAuthUrlMsg = getAuthUrlMsg
 
 getNewToken = (code, callback, robot) ->
@@ -46,7 +46,7 @@ getNewToken = (code, callback, robot) ->
       storeToken token
     catch err
       callback null, 'Error while trying to retrieve access token:' + err; return
-    callback 'Authorize information was saved!', null
+    callback 'Access token was saved!', null
 exports.getNewToken = getNewToken
 
 storeToken = (token) ->
