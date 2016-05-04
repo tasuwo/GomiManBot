@@ -9,6 +9,7 @@
 #   gomi-man-bot authorization code
 #   gomi-man-bot auth with <url> - Retrive access token and store it
 #   gomi-man-bot assign - Retrive duties from google calendar and assign users
+#   gomi-man-bot assign reset - Reset assignments
 #   gomi-man-bot assign list - Assignments list
 #   gomi-man-bot users list - Display users saved in this app
 #   gomi-man-bot save me as <B4|M1|M2> - Save user as B4|M1|M2
@@ -56,6 +57,11 @@ module.exports = (robot) ->
     messages = as.getAssignmentsListMsg robot
     for message in messages
       msg.send message
+
+
+  robot.respond /assign reset/i, (msg) ->
+    as.resetAssignmentsList robot
+    msg.send "Successfully reset assignment!"
 
 
   robot.respond /users list/i, (msg) ->

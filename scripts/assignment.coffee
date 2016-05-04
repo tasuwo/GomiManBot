@@ -10,11 +10,16 @@ getAssignmentsList = (robot) ->
   return robot.brain.get(ASSIGNMENTS_KEY) or null
 exports.getAssignmentsList = getAssignmentsList
 
+resetAssignmentsList = (robot) ->
+  robot.brain.set(ASSIGNMENTS_KEY, null)
+  robot.brain.set(LAST_ASSIGNED_MONTH, null)
+exports.resetAssignmentsList = resetAssignmentsList
+
 getAssignmentsListMsg = (robot) ->
   assignments = getAssignmentsList robot
   unless assignments?
     return [ "There are no assignments. Please
-    assign users to duty by `assign members` command." ]
+    assign users to duty by `assign users` command." ]
   msg = []
   for assignment in assignments
     date = assignment["date"]
@@ -42,7 +47,7 @@ assign = (robot, _callback) ->
     keys            = Object.keys(dates)
     thisMonth       = keys[0].split("-")[0]
     willAssignMonth = robot.brain.get(LAST_ASSIGNED_MONTH) or ""
-    if thisMonth == willAssignMonth
+    if thisMonth == willAssignMonth && getAssignmentsList(robot)?
       msg = []
       msg.push "Assignment of this month has perfomed as follows"
       Array.prototype.push.apply(msg, getAssignmentsListMsg(robot))
