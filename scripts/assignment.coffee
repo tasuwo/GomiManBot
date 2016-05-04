@@ -22,6 +22,7 @@ getAssignmentsListMsg = (robot) ->
     assign = assignment["assign"]
     msg.push "date:#{date}, duty:#{duty}, assign:#{assign}"
   return msg
+exports.getAssignmentsListMsg = getAssignmentsListMsg
 
 assign = (robot, _callback) ->
   async.waterfall [
