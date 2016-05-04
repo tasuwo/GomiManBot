@@ -50,17 +50,14 @@ module.exports = (robot) ->
     catch error
       msg.send error
 
-
   robot.respond /assign list/i, (msg) ->
     messages = as.getAssignmentsListMsg robot
     for message in messages
       msg.send message
 
-
   robot.respond /assign reset/i, (msg) ->
     as.resetAssignmentsList robot
     msg.send "Successfully reset assignment!"
-
 
   robot.respond /users list/i, (msg) ->
     users = user.getAll(robot)
@@ -73,7 +70,6 @@ module.exports = (robot) ->
       name = user["name"]
       msg.send "name:#{user["name"]}, grade:#{user["grade"]}"
     )
-
 
   robot.respond /save me as (B4|M1|M2)/i, (msg) ->
     name  = msg.envelope.user.name
@@ -88,7 +84,6 @@ module.exports = (robot) ->
     catch error
       msg.send "#{error}"
 
-
   robot.respond /update (.+) : (.+) > (.+)/i, (msg) ->
     name = msg.match[0].split(" ")[2]
     prop = msg.match[0].split(" ")[4]
@@ -98,7 +93,6 @@ module.exports = (robot) ->
       msg.send "Successfully updated!"
     catch error
       msg.send "#{error}"
-
 
   robot.respond /remove (.+)/i, (msg) ->
     name = msg.match[0].split(" ")[2]
