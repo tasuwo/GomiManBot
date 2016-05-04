@@ -26,12 +26,15 @@ cron = require("./cron.coffee")
 as = require("./assignment.coffee")
 
 module.exports = (robot) ->
+  regexes = []
   cron.startJobs(robot, "test")
 
-  robot.respond /auth get url/i, (msg) ->
+  regex = "auth get url"; regexes.push regex
+  robot.respond "/"+regex+"/", (msg) ->
     msg.send do calendar.getAuthUrlMsg
 
-  robot.respond /auth with (.+)/i, (msg) ->
+  regex = "auth with (.+)"; regexes.push regex
+  robot.respond "/"+regex+"/", (msg) ->
     code = msg.match[0].split(" ")[3]
     calendar.getNewToken code, (res, err) ->
       if err
@@ -39,7 +42,8 @@ module.exports = (robot) ->
       msg.send res
     , robot
 
-  robot.respond /assign users/i, (msg) ->
+  regex = "assign users"; regexes.push regex
+  robot.respond "/"+regex+"/", (msg) ->
     try
       as.assign(robot, (messages, err) ->
         if err
@@ -50,16 +54,19 @@ module.exports = (robot) ->
     catch error
       msg.send error
 
-  robot.respond /assign list/i, (msg) ->
+  regex = "assign list"; regexes.push regex
+  robot.respond "/"+regex+"/", (msg) ->
     messages = as.getAssignmentsListMsg robot
     for message in messages
       msg.send message
 
-  robot.respond /assign reset/i, (msg) ->
+  regex = "assign reset"; regexes.push regex
+  robot.respond "/"+regex+"/", (msg) ->
     as.resetAssignmentsList robot
     msg.send "Successfully reset assignment!"
 
-  robot.respond /users list/i, (msg) ->
+  regex = "users list"; regexes.push regex
+  robot.respond "/"+regex+"/", (msg) ->
     users = user.getAll(robot)
     unless users?
       msg.send "There are no users. Please regist users by `save me as
@@ -71,7 +78,8 @@ module.exports = (robot) ->
       msg.send "name:#{user["name"]}, grade:#{user["grade"]}"
     )
 
-  robot.respond /save me as (B4|M1|M2)/i, (msg) ->
+  regex = "save me as (B4|M1|M2)"; regexes.push regex
+  robot.respond "/"+regex+"/", (msg) ->
     name  = msg.envelope.user.name
     grade = msg.match[0].split(" ")[4]
     user_info = {
@@ -84,7 +92,8 @@ module.exports = (robot) ->
     catch error
       msg.send "#{error}"
 
-  robot.respond /update (.+) : (.+) > (.+)/i, (msg) ->
+  regex = "update (.+) : (.+) > (.+)"; regexes.push regex
+  robot.respond "/"+regex+"/", (msg) ->
     name = msg.match[0].split(" ")[2]
     prop = msg.match[0].split(" ")[4]
     val  = msg.match[0].split(" ")[6]
@@ -94,10 +103,19 @@ module.exports = (robot) ->
     catch error
       msg.send "#{error}"
 
-  robot.respond /remove (.+)/i, (msg) ->
+  regex = "remove (.+)"; regexes.push regex
+  robot.respond "/"+regex+"/", (msg) ->
     name = msg.match[0].split(" ")[2]
     try
       user.remove(name, robot)
       msg.send "Successfully removed!"
     catch error
       msg.send "#{error}"
+
+  # TODO: Intelligence match
+  robot.hear new RegExp("^@gomi-man-bot: (?!("+regexes.join("|")+"))", "g"), (msg) ->
+    msg.send msg.random [
+      "I don't understand.",
+      "Sorry, #{msg.envelope.user.name}, I didn't get that.",
+      "That does not compute, #{msg.envelope.user.name}."
+    ]
