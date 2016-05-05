@@ -36,7 +36,7 @@ decrementDayOfCronSetting = (cronSetting) ->
 exports.decrementDayOfCronSetting = decrementDayOfCronSetting
 
 exports.startJobs = (robot, channnel) ->
-  new cronJob('0 0 12 1 */1 *', (channel) =>
+  new cronJob('0 0 12 1 */1 *', () =>
     envelope = room: channel
     messages = [ "@channel Check!" ]
     as.assign(robot, (resultMsgs, err) ->
@@ -62,7 +62,7 @@ startAssignCronJobs = (robot, channel, assignments) ->
       assignedDate = translateDateToCronSetting(assignment["date"])
       notifiedDate = decrementDayOfCronSetting(assignedDate)
       assignCronJobs.push(
-        new cronJob(notifiedDate, (channel) =>
+        new cronJob(notifiedDate, () =>
           envelope = room: channel
           robot.send envelope, "@"+assignment["assign"]+" You are assigned to duty in tommorow"
         )
