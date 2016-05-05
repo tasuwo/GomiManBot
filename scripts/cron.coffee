@@ -38,8 +38,8 @@ decrementDayOfCronSetting = (cronSetting) ->
   # 月ごとの最終日を考慮するのが面倒なので，最小にあわせておく
   settings[3] = if day>1 then day-1 else 29
   if day == 1
-    # node-cron では Months は 0-11 なので，1を引かずにそのまま返す
-    settings[4] = if month==0 then 12 else month
+    # node-cron では Months は 0-11
+    settings[4] = if month==0 then 11 else month-1
   return settings.join(" ")
 exports.decrementDayOfCronSetting = decrementDayOfCronSetting
 
