@@ -76,8 +76,7 @@ module.exports = (robot) ->
   robot.respond "/"+regex+"/", (msg) ->
     users = user.getAll(robot)
     unless users?
-      msg.send "There are no users. Please regist users by `save me as
-    B4|M1|M2`"
+      msg.send "There are no users. Please regist users by `save me as B4|M1|M2`"
       return
     msg.send "Registerd users are as follows..."
     users.forEach((user) ->
