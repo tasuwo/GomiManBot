@@ -59,7 +59,8 @@ startAssignCronJobs = (assignments) ->
       assignedDate = translateDateToCronSetting(assignment["date"])
       notifiedDate = decrementDayOfCronSetting(assignedDate)
       assignCronJobs.push(
-        new cronJob(notifiedDate, () =>
+        new cronJob(notifiedDate, (channel) =>
+          envelope = room: channel
           robot.send envelope, "@"+assignment["assign"]+" You are assigned to duty in tommorow"
         )
       )
