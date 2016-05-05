@@ -50,7 +50,7 @@ set = (user_info, robot) ->
 
   users = getAll(robot) or []
   users.push(user_info)
-  robot.brain.set(USERS_KEY, sortUsersByGrade(users))
+  save(sortUsersByGrade(users), robot)
 exports.set = set
 
 
@@ -67,7 +67,7 @@ update = (name, prop, value, robot) ->
 
   users = getAll(robot)
   users[index] = user
-  robot.brain.set(USERS_KEY, sortUsersByGrade(users))
+  save(sortUsersByGrade(users), robot)
 exports.update = update
 
 
@@ -83,7 +83,7 @@ remove = (name, robot) ->
     users = null
   else
     users = sortUsersByGrade(users)
-  robot.brain.set(USERS_KEY, users)
+  save(users, robot)
 exports.remove = remove
 
 
@@ -93,3 +93,11 @@ getIndexByName = (name, users) ->
       return index
   return null
 exports.getIndexByName = getIndexByName
+
+
+save = (users, robot) ->
+  if users?
+    i = 1
+    users.map (el) ->
+      el["id"] = i++
+  robot.brain.set(USERS_KEY, users)

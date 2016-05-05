@@ -75,7 +75,7 @@ module.exports = (robot) ->
     msg.send "Registerd users are as follows..."
     users.forEach((user) ->
       name = user["name"]
-      msg.send "name:#{user["name"]}, grade:#{user["grade"]}"
+      msg.send "`#{user["id"]}` name:#{user["name"]}, grade:#{user["grade"]}"
     )
 
   regex = "save me as (B4|M1|M2)"; regexes.push regex
