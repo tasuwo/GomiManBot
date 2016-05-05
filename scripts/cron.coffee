@@ -15,7 +15,8 @@ exports.translateDateToCronSetting = translateDateToCronSetting
 translateCronSettingToDate = (cronSetting) ->
   if cronSetting.split(" ").length != 6
     throw Error "Invalid arguement"
-  month = parseInt(cronSetting.split(" ")[4])
+  # node-cron では Months は 0-11 なので，1を足しておく
+  month = parseInt(cronSetting.split(" ")[4]) + 1
   day   = parseInt(cronSetting.split(" ")[3])
   return "#{month}/#{day}"
 exports.translateCronSettingToDate = translateCronSettingToDate
@@ -56,7 +57,7 @@ resetAssignCronJobs = () ->
 
 startAssignCronJobs = (robot, channel, assignments) ->
   if assignments?
-    msg = ['Assigned cron jobs are follows']
+    # msg = ['Assigned cron jobs are follows']
     for assignment in assignments
       assignedDate = translateDateToCronSetting(assignment["date"])
       notifiedDate = decrementDayOfCronSetting(assignedDate)
@@ -66,12 +67,13 @@ startAssignCronJobs = (robot, channel, assignments) ->
           robot.send envelope, "@"+assignment["assign"]+" You are assigned to duty in tommorow"
         )
       )
-      msgDate = translateCronSettingToDate notifiedDate
-      msgName = assignment["assign"]
-      msg.push "date:#{msgDate}, name:#{msgName}"
+      # msgDate = translateCronSettingToDate notifiedDate
+      # msgName = assignment["assign"]
+      # msg.push "date:#{msgDate}, name:#{msgName}"
     for job in assignCronJobs
       job.start()
-    return msg
+    # return msg
+    return []
   else
     throw Error "There are no assignment for creating cron jobs"
 exports.startAssignCronJobs = startAssignCronJobs
