@@ -6,7 +6,8 @@ assignCronJobs = []
 translateDateToCronSetting = (date) ->
   if date.split("-").length != 3
     throw Error "Invalid arguement"
-  month = parseInt(date.split("-")[1])
+  # node-cron では Months は 0-11 なので，1を引いておく
+  month = parseInt(date.split("-")[1]) - 1
   day   = parseInt(date.split("-")[2])
   return '0 0 12 ' + day + ' ' + month + ' *'
 exports.translateDateToCronSetting = translateDateToCronSetting
@@ -28,7 +29,8 @@ decrementDayOfCronSetting = (cronSetting) ->
   # 月ごとの最終日を考慮するのが面倒なので，最小にあわせておく
   settings[3] = if day>1 then day-1 else 29
   if day == 1
-    settings[4] = if month==1 then 12 else month-1
+    # node-cron では Months は 0-11 なので，1を引かずにそのまま返す
+    settings[4] = if month==0 then 12 else month
   return settings.join(" ")
 exports.decrementDayOfCronSetting = decrementDayOfCronSetting
 
