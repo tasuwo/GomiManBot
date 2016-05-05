@@ -27,7 +27,14 @@ as = require("./assignment.coffee")
 
 module.exports = (robot) ->
   regexes = []
-  cron.startJobs(robot, "test")
+  cron.startJobs(robot)
+
+  # TODO : set automatically when bot is invited
+  regex = "channel set (.+)"; regexes.push regex
+  robot.respond "/"+regex+"/", (msg) ->
+    channel = msg.match[0].split(" ")[3]
+    cron.setNotifyChannel channel
+    msg.send "I'll notify to channel: #{channel}"
 
   regex = "auth get url"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
