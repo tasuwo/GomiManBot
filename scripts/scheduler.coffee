@@ -1,14 +1,11 @@
 user = require("./user.coffee")
 LAST_ASSIGNED_USER_KEY = 'last_assigned_user'
 
-
 exports.getLastAssignedUserName = (robot) ->
   return robot.brain.get(LAST_ASSIGNED_USER_KEY)
 
-
 exports.setLastAssignedUserName = (user, robot) ->
   robot.brain.set(LAST_ASSIGNED_USER_KEY, user)
-
 
 assign = (users, dateAndDuties, lastAssignedUserName) ->
   unless users? || dateAndDuties? || lastAssignedUserName?
@@ -38,7 +35,6 @@ assign = (users, dateAndDuties, lastAssignedUserName) ->
     assignments.push(assignmentOfEachDate)
   return assignments
 exports.assign = assign
-
 
 decideMembersForAssignment = (startIndex, nMember, users) ->
   unless startIndex? || nMember? || users?

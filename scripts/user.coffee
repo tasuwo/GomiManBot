@@ -2,7 +2,6 @@ uuid = require "./uuid.coffee"
 
 USERS_KEY = 'users'
 
-
 sortUsersByGrade = (users) ->
   unless users?
     throw Error "Users are empty"
@@ -26,11 +25,9 @@ sortUsersByGrade = (users) ->
   return sortedUsers
 exports.sortUsersByGrade = sortUsersByGrade
 
-
 getAll = (robot) ->
   return robot.brain.get(USERS_KEY) or null
 exports.getAll = getAll
-
 
 getByName = (name, robot) ->
   result = null
@@ -43,7 +40,6 @@ getByName = (name, robot) ->
   return result
 exports.getByName = getByName
 
-
 set = (user_info, robot) ->
   if getByName(user_info["name"], robot)?
     throw Error "User name is duplicate"
@@ -52,7 +48,6 @@ set = (user_info, robot) ->
   users.push(user_info)
   save(sortUsersByGrade(users), robot)
 exports.set = set
-
 
 update = (name, prop, value, robot) ->
   update_user_info = getByName(name, robot)
@@ -69,7 +64,6 @@ update = (name, prop, value, robot) ->
   users[index] = user
   save(sortUsersByGrade(users), robot)
 exports.update = update
-
 
 remove = (name, robot) ->
   remove_user_info = getByName(name, robot)
@@ -93,7 +87,6 @@ getIndexByName = (name, users) ->
       return index
   return null
 exports.getIndexByName = getIndexByName
-
 
 save = (users, robot) ->
   if users?
