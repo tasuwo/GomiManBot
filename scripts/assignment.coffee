@@ -2,6 +2,7 @@ calendar = require("./google-calendar.coffee")
 scheduler = require("./scheduler.coffee")
 user = require("./user.coffee")
 async = require("async")
+cron = require("./cron.coffee")
 
 ASSIGNMENTS_KEY = 'assignments_key'
 LAST_ASSIGNED_MONTH = 'last_assigned_month'
@@ -77,5 +78,7 @@ assign = (robot, _callback) ->
         duty   = assignment["duty"]
         member = assignment["assign"]
         msg.push "date:#{date}, duty:#{duty}, member:#{member}"
+      cron.resetAssignCronJobs
+      Array.prototype.push.apply(msg, cron.startAssignCronJobs assignments)
       _callback msg, null
 exports.assign = assign
