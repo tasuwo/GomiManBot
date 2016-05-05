@@ -7,6 +7,14 @@ cron = require("./cron.coffee")
 ASSIGNMENTS_KEY = 'assignments_key'
 LAST_ASSIGNED_MONTH = 'last_assigned_month'
 
+setAssignmentsList = (assignments, robot) ->
+  if assignments?
+    i = 1
+    assignments.map (el) ->
+      el["id"] = i++
+    robot.brain.set(ASSIGNMENTS_KEY, assignments)
+exports.setAssignmentsList = setAssignmentsList
+
 getAssignmentsList = (robot) ->
   return robot.brain.get(ASSIGNMENTS_KEY) or null
 exports.getAssignmentsList = getAssignmentsList
@@ -51,7 +59,7 @@ assign = (robot, _callback) ->
       msg = []
       msg.push "Assignment of this month has perfomed as follows"
       Array.prototype.push.apply(msg, getAssignmentsListMsg(robot))
-      callback null, [], msg, true; return
+      callback null, msg, true; return
 
     users = user.getAll(robot)
     unless users?
@@ -59,12 +67,12 @@ assign = (robot, _callback) ->
     lastUserName = scheduler.getLastAssignedUserName(robot) or users[0]["name"]
     assignments  = scheduler.assign(users, dates, lastUserName)
 
-    robot.brain.set(ASSIGNMENTS_KEY, assignments)
+    setAssignmentsList(assignments, robot)
     scheduler.setLastAssignedUserName(assignments[assignments.length-1]["assign"],robot)
     robot.brain.set(LAST_ASSIGNED_MONTH, thisMonth)
 
-    callback null, assignments, "", false
-  ], (err, assignments, message, preStoredflg) ->
+    callback null, "", false
+  ], (err, message, preStoredflg) ->
     if err
       _callback null, err; return
 
@@ -73,12 +81,16 @@ assign = (robot, _callback) ->
     else
       msg = []
       msg.push "Some members were assigned to duty as follows!"
+      assignments = getAssignmentsList robot
       for assignment in assignments
+        id     = assignment["id"]
         date   = assignment["date"]
         duty   = assignment["duty"]
         member = assignment["assign"]
-        msg.push "date:#{date}, duty:#{duty}, member:#{member}"
+        msg.push "`#{id}` date:#{date}, duty:#{duty}, member:#{member}"
+
       cron.resetAssignCronJobs
       Array.prototype.push.apply(msg, cron.startAssignCronJobs assignments)
+
       _callback msg, null
 exports.assign = assign
