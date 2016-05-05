@@ -90,7 +90,7 @@ assign = (robot, _callback) ->
         msg.push "`#{id}` date:#{date}, duty:#{duty}, member:#{member}"
 
       cron.resetAssignCronJobs
-      Array.prototype.push.apply(msg, cron.startAssignCronJobs assignments)
+      Array.prototype.push.apply(msg, cron.startAssignCronJobs(robot, assignments))
 
       _callback msg, null
 exports.assign = assign

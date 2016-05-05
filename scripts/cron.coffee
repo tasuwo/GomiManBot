@@ -52,7 +52,7 @@ resetAssignCronJobs = () ->
       job.stop()
     assignCronJobs = []
 
-startAssignCronJobs = (assignments) ->
+startAssignCronJobs = (robot, assignments) ->
   if assignments?
     msg = ['Assigned cron jobs are follows']
     for assignment in assignments
