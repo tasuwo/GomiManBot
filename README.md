@@ -10,6 +10,6 @@ gomi-man-bot is a chat bot built on the [Hubot][hubot] framework.
 - ユーザの並べ替えを指定できるようにする
 - api token の取得を自動化する
 - channel の取得を自動化する
-- googleapi と cron のテストを書く
+- ~~googleapi と cron のテストを書く~~
 - 割り当てる最初のユーザを指定できる
 - 当番を自動/手動指定できるようにする
