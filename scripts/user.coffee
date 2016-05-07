@@ -1,5 +1,3 @@
-uuid = require "./uuid.coffee"
-
 USERS_KEY = 'users'
 
 sortUsersByGrade = (users) ->
