@@ -1,4 +1,4 @@
-calendar = require("./google-calendar.coffee")
+api = require("./googleapi.coffee")
 user = require("./user.coffee")
 async = require("async")
 cron = require("./cron.coffee")
@@ -45,7 +45,7 @@ exports.assign = (robot, callback) ->
   # TODO: replace async with generator
   async.waterfall [
     (next) =>
-      calendar.authorize(robot, (oauth2Client, err) ->
+      api.authorize(robot, (oauth2Client, err) ->
         if err?
           next err; return
         unless oauth2Client?
@@ -53,7 +53,7 @@ exports.assign = (robot, callback) ->
         next null, oauth2Client
       )
   , (auth, next) =>
-    calendar.getEvents(auth, ["clean"], (dates) ->
+    api.getEvents(auth, ["clean"], (dates) ->
       unless dates?
         next "There are no events on calendar for assignment"; return
       next null, dates

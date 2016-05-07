@@ -4,7 +4,7 @@ chai.should()
 sinon = require 'sinon'
 
 assignment = require('./../scripts/assignment.coffee')
-calendar = require('./../scripts/google-calendar.coffee')
+api = require('./../scripts/googleapi.coffee')
 users = require('./../scripts/user.coffee')
 
 describe '当番の割り当てに関するテスト',->
@@ -34,16 +34,16 @@ describe '当番の割り当てに関するテスト',->
     saveAssignmentStub = null
 
     before ->
-      authorizeStub = sinon.stub(calendar, 'authorize')
-      getEventsStub = sinon.stub(calendar, 'getEvents')
+      authorizeStub = sinon.stub(api, 'authorize')
+      getEventsStub = sinon.stub(api, 'getEvents')
       getLastAssignedMonthStub = sinon.stub(assignment, 'getLastAssignedMonth')
       getLastAssignedUserStub  = sinon.stub(assignment, 'getLastAssignedUser')
       getAllStub = sinon.stub(users, 'getAll')
       saveAssignmentStub = sinon.stub(assignment, 'saveAssignments')
 
     after ->
-      calendar.authorize.restore()
-      calendar.getEvents.restore()
+      api.authorize.restore()
+      api.getEvents.restore()
       assignment.getLastAssignedMonth.restore()
       assignment.getLastAssignedUser.restore()
       users.getAll.restore()

@@ -1,5 +1,5 @@
 # Description
-#   Assign users to duty on google calendar
+#   Assign users to duty on google api
 #
 # Configuration:
 #   None
@@ -18,7 +18,7 @@
 # Author:
 #   tasuwo <kamuhata.you@gmail.com>
 
-calendar = require("./google-calendar.coffee")
+api = require("./googleapi.coffee")
 user = require("./user.coffee")
 async = require("async")
 cron = require("./cron.coffee")
@@ -37,12 +37,12 @@ module.exports = (robot) ->
 
   regex = "auth get url"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
-    msg.send do calendar.getAuthUrlMsg
+    msg.send do api.getAuthUrlMsg
 
   regex = "auth with (.+)"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
     code = msg.match[0].split(" ")[3]
-    calendar.getNewToken code, (res, err) ->
+    api.getNewToken code, (res, err) ->
       if err
         msg.send err; return
       msg.send res
