@@ -19,7 +19,6 @@
 #   tasuwo <kamuhata.you@gmail.com>
 
 calendar = require("./google-calendar.coffee")
-scheduler = require("./scheduler.coffee")
 user = require("./user.coffee")
 async = require("async")
 cron = require("./cron.coffee")
@@ -52,11 +51,20 @@ module.exports = (robot) ->
   regex = "assign users"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
     try
-      as.assign(robot, (messages, err) ->
+      as.assign(robot, (err, preStoredFlg) ->
         if err
-          msg.send err; return
+          msg.send err
+          return
+        messages = if preStoredFlg
+        then ["Assignment of this month has perfomed as follows"]
+        else ["Some members were assigned to duty as follows!"]
+        Array.prototype.push.apply(messages, as.getAssignmentsListMsg(as.getAssignmentsList(robot)))
+
         for message in messages
           msg.send message
+
+        cron.resetAssignCronJobs
+        cron.startAssignCronJobs(robot, as.getAssignmentsList(robot))
       )
     catch error
       msg.send error
