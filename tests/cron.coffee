@@ -1,10 +1,12 @@
+sinon = require 'sinon'
 chai = require 'chai'
 expect = chai.expect
 chai.should()
 
 cron = require('./../scripts/cron.coffee')
+as   = require('./../scripts/assignment.coffee')
 
-describe 'ユーザデータに対する操作', ->
+describe 'Cronに関するテスト', ->
 
   context "日時文字列 <=> cron設定 変換", ->
     it "日時の文字列をcronの設定に変換する", ->
@@ -25,3 +27,36 @@ describe 'ユーザデータに対する操作', ->
     it "不正な引数が与えられた場合には例外を発行する", ->
       expect(cron.decrementDayOfCronSetting.bind(cron, null)).to.throw(Error)
       expect(cron.decrementDayOfCronSetting.bind(cron, "0 12 * *")).to.throw(Error)
+
+  context "定期的な cron job の実行テスト", (done) ->
+    clock = null
+    assignments = [
+        { date: "2016-10-03" }
+        { date: "2016-10-06" }
+    ]
+
+    afterEach ->
+      if clock?
+        clock.restore()
+
+    it "毎月一日に通知を行う", ->
+      asMock = sinon.mock(as)
+      clock = sinon.useFakeTimers(new Date(2016, 10, 1, 11, 59).getTime())
+      asMock.expects("assign").once()
+
+      cron.startJobs(null)
+      clock.tick(60 * 1000)
+
+      asMock.verify()
+      asMock.restore()
+
+    it "当番の前日にユーザに向けて通知を行う", ->
+      crMock = sinon.mock(cron)
+      clock = sinon.useFakeTimers(new Date(2016, 9, 2, 11, 59).getTime())
+      crMock.expects("sendMessage").twice()
+      cron.startAssignCronJobs(null, assignments)
+      clock.tick(60 * 1000)
+      clock.tick(2 * 3 * 24 * 60 * 60 * 1000)
+
+      crMock.verify()
+      crMock.restore()
