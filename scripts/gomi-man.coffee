@@ -5,15 +5,20 @@
 #   None
 #
 # Commands:
-#   gomi-man-bot auth get url - Get url and visit there, you'll be able to retrive authorization code
-#   gomi-man-bot auth with <url> - Retrive access token and store it
-#   gomi-man-bot assign users - Retrive duties from google calendar and assign users
-#   gomi-man-bot assign reset - Reset assignments
-#   gomi-man-bot assign list - Assignments list
-#   gomi-man-bot users list - Display users saved in this app
-#   gomi-man-bot save me as <B4|M1|M2> - Save user as B4|M1|M2
-#   gomi-man-bot update <username> : <property> > <value> - Update users <property>'s value to <value>
-#   gomi-man-bot remove <username> - Remove user who has <username>
+#   auth get url           - Get url to retrieve authorization code
+#   auth with <code>       - Retrive access token and store it with authorization code
+#   assign users           - Retrive duties from google calendar and assign users to them
+#   assign reset           - Reset assignments
+#   assign list            - Assignments list
+#   assign from <uid>      - Set user who will be assigned to duty at first in next assignment
+#   channel set <name>     - Set notification channel (default: develop)
+#   channel check          - Check norification channel
+#   users list             - Show users saved in this app
+#   users sort by <method> - Sort user based on method. (method: grade)
+#   users swap <id> <id>   - Swap user position in the list
+#   save me as <grade>     - Save user who send this command as specified grade (grade: B4, M1, M2)
+#   update <id> : <prop> > <value> - Update specified user's <property>'s value to <value>
+#   remove <id>            - Remove specified user
 #
 # Author:
 #   tasuwo <kamuhata.you@gmail.com>
