@@ -103,6 +103,18 @@ module.exports = (robot) ->
       msg.send "`#{user["id"]}` name:#{user["name"]}, grade:#{user["grade"]}"
     )
 
+  regex = "users sort by (grade)"; regexes.push regex
+  robot.respond "/"+regex+"/", (msg) ->
+    sortMethod = msg.match[0].split(" ")[4]
+    users = user.getAll(robot)
+    unless users?
+      msg.send "There are no users. Please regist users by `save me as B4|M1|M2`"
+    switch sortMethod
+      when "grade"
+        users = user.sortUsersByGrade(users)
+    user.save(users, robot)
+    msg.send "Users were sorted by grade!"
+
   regex = "save me as (B4|M1|M2)"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
     name  = msg.envelope.user.name

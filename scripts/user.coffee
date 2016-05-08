@@ -5,7 +5,7 @@ exports.getAll = (robot) ->
 
 exports.save = (users, robot) ->
   if users?
-    users = this.sortUsersByGrade(users)
+    #users = this.sortUsersByGrade(users)
     i = 1
     users.map (el) ->
       el["id"] = i++
