@@ -115,6 +115,16 @@ module.exports = (robot) ->
     user.save(users, robot)
     msg.send "Users were sorted by grade!"
 
+  regex = "users swap [0-9]+ [0-9]+"
+  robot.respond "/"+regex+"/", (msg) ->
+    id1 = parseInt(msg.match[0].split(" ")[3])
+    id2 = parseInt(msg.match[0].split(" ")[4])
+    try
+      user.swap(id1,id2,robot)
+      msg.send "Swapped user #{id1} and #{id2}!"
+    catch error
+      msg.send "#{error}"
+
   regex = "save me as (B4|M1|M2)"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
     name  = msg.envelope.user.name

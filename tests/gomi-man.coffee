@@ -177,6 +177,41 @@ describe 'ユーザコマンドのテスト', ->
           ['hubot', 'Error: Assigned user name doesn\'t exist']
       ]
 
+  context '交換', ->
+    getAllStub = null
+
+    beforeEach ->
+      usersData = [
+        {"id":1, "name":"tasuwo", "grade":"M1"},
+        {"id":2, "name":"tozawa", "grade":"M2"},
+        {"id":3, "name":"tetsuwo", "grade":"B4"},
+        {"id":4, "name":"aaa", "grade":"M1"},
+      ]
+      getAllStub = sinon.stub(user, 'getAll')
+      getAllStub.returns(usersData)
+      co =>
+        yield room.user.say 'alice', 'hubot users swap 2 4'
+        yield room.user.say 'alice', 'hubot users list'
+        yield room.user.say 'alice', 'hubot users swap 0 10'
+
+    afterEach ->
+      getAllStub.restore()
+
+    it 'ユーザの順番を交換する', ->
+      expect(room.messages.toString()).to.equal [
+        ['alice', 'hubot users swap 2 4']
+        ['hubot', 'Swapped user 2 and 4!']
+        ['alice', 'hubot users list']
+        ['hubot', 'Registerd users are as follows...']
+        ['hubot', '`1` name:tasuwo, grade:M1']
+        ['hubot', '`2` name:aaa, grade:M1']
+        ['hubot', '`3` name:tetsuwo, grade:B4']
+        ['hubot', '`4` name:tozawa, grade:M2']
+        ['alice', 'hubot users swap 0 10']
+        ['hubot', 'Error: Specified user id doesn\'t exist']
+      ].toString()
+
+
   context 'ユーザ割り当て', ->
     getAllStub = null
 

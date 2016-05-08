@@ -59,6 +59,18 @@ exports.remove = (id, robot) ->
     users = null
   this.save(users, robot)
 
+exports.swap = (id1, id2, robot) ->
+  user1 = this.getBy("id",id1,robot)
+  user2 = this.getBy("id",id2,robot)
+  unless user1? || user2?
+    throw Error "Specified user id doesn't exist"
+  index1 = user1[1]
+  index2 = user2[1]
+  users = this.getAll(robot)
+  users[index1] = user2[0]
+  users[index2] = user1[0]
+  this.save(users, robot)
+
 exports.sortUsersByGrade = (users) ->
   unless users?
     throw Error "Users are empty"
