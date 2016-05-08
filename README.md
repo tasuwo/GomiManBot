@@ -4,7 +4,7 @@ gomi-man-bot is a chat bot built on the [Hubot][hubot] framework.
 
 ## TODO
 
-- ユーザ，スケジュールをIDで操作できるようにする
+- ~~ユーザ，スケジュールをIDで操作できるようにする~~
 - ユーザ，スケジュールをswapできるようにする
 - ユーザ情報を自由に追加，編集，削除できるようにする
 - ユーザの並べ替えを指定できるようにする
