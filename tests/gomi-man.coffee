@@ -195,7 +195,7 @@ describe 'ユーザコマンドのテスト', ->
         yield room.user.say 'alice', 'hubot users swap 0 10'
 
     afterEach ->
-      getAllStub.restore()
+      user.getAll.restore()
 
     it 'ユーザの順番を交換する', ->
       expect(room.messages.toString()).to.equal [
@@ -229,7 +229,7 @@ describe 'ユーザコマンドのテスト', ->
         yield room.user.say 'alice', 'hubot assign from 5'
 
     afterEach ->
-      getAllStub.restore()
+      user.getAll.restore()
 
     it 'ユーザ割り当てを途中から開始する', ->
       expect(room.messages).to.eql [
@@ -237,4 +237,22 @@ describe 'ユーザコマンドのテスト', ->
         ['hubot', 'Assign from `2` tozawa in next assignment!'],
         ['alice', 'hubot assign from 5'],
         ['hubot', 'Error: There are no specified user']
+      ]
+
+  context 'チャンネル設定', ->
+    beforeEach ->
+      co =>
+        yield room.user.say 'alice', 'hubot channel check'
+        yield room.user.say 'alice', 'hubot channel set develop'
+        yield room.user.say 'alice', 'hubot channel check'
+
+    it '通知用チャンネルを保存する', ->
+      expect(room.messages).to.eql [
+        ['alice', 'hubot channel check']
+        ['hubot', 'No channel registered. Please save channel by
+      `channel set <channel name>` command.']
+        ['alice', 'hubot channel set develop']
+        ['hubot', 'I\'ll send notification to channel: #develop!']
+        ['alice', 'hubot channel check']
+        ['hubot', 'Notify channel is set to #develop']
       ]

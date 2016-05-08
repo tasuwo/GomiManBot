@@ -32,8 +32,17 @@ module.exports = (robot) ->
   regex = "channel set (.+)"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
     channel = msg.match[0].split(" ")[3]
-    cron.setNotifyChannel channel
-    msg.send "I'll notify to channel: #{channel}"
+    cron.setNotifyChannel(channel, robot)
+    msg.send "I'll send notification to channel: ##{channel}!"
+
+  regex = "channel check"; regexes.push regex
+  robot.respond "/"+regex+"/", (msg) ->
+    channel = cron.getNotifyChannel(robot)
+    unless channel?
+      msg.send "No channel registered. Please save channel by `channel
+  set <channel name>` command."
+      return
+    msg.send "Notify channel is set to ##{channel}"
 
   regex = "auth get url"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
