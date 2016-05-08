@@ -106,22 +106,22 @@ module.exports = (robot) ->
     catch error
       msg.send "#{error}"
 
-  regex = "update (.+) : (.+) > (.+)"; regexes.push regex
+  regex = "update [0-9]+ : (.+) > (.+)"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
-    name = msg.match[0].split(" ")[2]
+    id   = parseInt(msg.match[0].split(" ")[2])
     prop = msg.match[0].split(" ")[4]
     val  = msg.match[0].split(" ")[6]
     try
-      user.update(name, prop, val, robot)
+      user.update(id, prop, val, robot)
       msg.send "Successfully updated!"
     catch error
       msg.send "#{error}"
 
-  regex = "remove (.+)"; regexes.push regex
+  regex = "remove [0-9]+"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
-    name = msg.match[0].split(" ")[2]
+    id = parseInt(msg.match[0].split(" ")[2])
     try
-      user.remove(name, robot)
+      user.remove(id, robot)
       msg.send "Successfully removed!"
     catch error
       msg.send "#{error}"

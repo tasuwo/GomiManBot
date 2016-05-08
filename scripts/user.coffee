@@ -1,6 +1,6 @@
 USERS_KEY = 'users'
 
-sortUsersByGrade = (users) ->
+exports.sortUsersByGrade = (users) ->
   unless users?
     throw Error "Users are empty"
   sortedUsers = []
@@ -21,73 +21,67 @@ sortUsersByGrade = (users) ->
   Array.prototype.push.apply(sortedUsers, m1)
   Array.prototype.push.apply(sortedUsers, m2)
   return sortedUsers
-exports.sortUsersByGrade = sortUsersByGrade
 
-getAll = (robot) ->
+exports.getAll = (robot) ->
   return robot.brain.get(USERS_KEY) or null
-exports.getAll = getAll
 
-getByName = (name, robot) ->
+exports.getBy = (property, value, robot) ->
+  # 一意にユーザを識別するプロパティのみ指定可
+  unless property == "name" || property == "id"
+    return null
+  users = this.getAll(robot)
+  unless users?
+    return null
   result = null
-  users = getAll(robot)
-  if users?
-    users.forEach((user, index) ->
-      if name == user["name"]
-        result = [user, index]
-    )
+  users.forEach (user, index) ->
+    if value == user[property]
+      result = [user, index]
   return result
-exports.getByName = getByName
 
-set = (user_info, robot) ->
-  if getByName(user_info["name"], robot)?
+exports.set = (user_info, robot) ->
+  if this.getBy("name", user_info["name"], robot)?
     throw Error "User name is duplicate"
-
-  users = getAll(robot) or []
+  users = this.getAll(robot) or []
   users.push(user_info)
-  save(sortUsersByGrade(users), robot)
-exports.set = set
+  this.save(users, robot)
 
-update = (name, prop, value, robot) ->
-  update_user_info = getByName(name, robot)
+exports.update = (id, prop, value, robot) ->
+  if prop=="name" && this.getBy("name", value, robot)?
+    throw Error "User name is duplicate"
+  if prop=="id"
+    throw Error "Cannot set id"
+  update_user_info = this.getBy("id", id, robot)
+  unless update_user_info?
+    throw Error "There are no specified user"
   user  = update_user_info[0]
   index = update_user_info[1]
-  if prop=="name" && getByName(value, robot)?
-    throw Error "User name is duplicate"
-
   unless user[prop]?
     throw Error "Assigned property doesn't exist"
   user[prop] = value
-
-  users = getAll(robot)
+  users = this.getAll(robot)
   users[index] = user
-  save(sortUsersByGrade(users), robot)
-exports.update = update
+  this.save(users, robot)
 
-remove = (name, robot) ->
-  remove_user_info = getByName(name, robot)
+exports.remove = (id, robot) ->
+  remove_user_info = this.getBy("id", id, robot)
   unless remove_user_info?
     throw Error "Assigned user name doesn't exist"
   index = remove_user_info[1]
-
-  users = getAll(robot)
+  users = this.getAll(robot)
   delete users.splice(index,1)
   if users.length == 0
     users = null
-  else
-    users = sortUsersByGrade(users)
-  save(users, robot)
-exports.remove = remove
+  this.save(users, robot)
 
-
-getIndexByName = (name, users) ->
+exports.getIndexByName = (name, users) ->
   for user, index in users
     if user["name"] == name
       return index
   return null
-exports.getIndexByName = getIndexByName
 
-save = (users, robot) ->
+exports.save = (users, robot) ->
   if users?
+    users = this.sortUsersByGrade(users)
     i = 1
     users.map (el) ->
       el["id"] = i++
