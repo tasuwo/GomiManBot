@@ -1,29 +1,21 @@
 USERS_KEY = 'users'
 
-exports.sortUsersByGrade = (users) ->
-  unless users?
-    throw Error "Users are empty"
-  sortedUsers = []
-  b4 = []
-  m1 = []
-  m2 = []
-  for user in users
-    switch user["grade"]
-      when "B4"
-        b4.push(user)
-      when "M1"
-        m1.push(user)
-      when "M2"
-        m2.push(user)
-      else
-        throw Error "Invalid user in users"
-  Array.prototype.push.apply(sortedUsers, b4)
-  Array.prototype.push.apply(sortedUsers, m1)
-  Array.prototype.push.apply(sortedUsers, m2)
-  return sortedUsers
-
 exports.getAll = (robot) ->
   return robot.brain.get(USERS_KEY) or null
+
+exports.getIndexByName = (name, users) ->
+  for user, index in users
+    if user["name"] == name
+      return index
+  return null
+
+exports.save = (users, robot) ->
+  if users?
+    users = this.sortUsersByGrade(users)
+    i = 1
+    users.map (el) ->
+      el["id"] = i++
+  robot.brain.set(USERS_KEY, users)
 
 exports.getBy = (property, value, robot) ->
   # 一意にユーザを識別するプロパティのみ指定可
@@ -73,16 +65,25 @@ exports.remove = (id, robot) ->
     users = null
   this.save(users, robot)
 
-exports.getIndexByName = (name, users) ->
-  for user, index in users
-    if user["name"] == name
-      return index
-  return null
+exports.sortUsersByGrade = (users) ->
+  unless users?
+    throw Error "Users are empty"
+  sortedUsers = []
+  b4 = []
+  m1 = []
+  m2 = []
+  for user in users
+    switch user["grade"]
+      when "B4"
+        b4.push(user)
+      when "M1"
+        m1.push(user)
+      when "M2"
+        m2.push(user)
+      else
+        throw Error "Invalid user in users"
+  Array.prototype.push.apply(sortedUsers, b4)
+  Array.prototype.push.apply(sortedUsers, m1)
+  Array.prototype.push.apply(sortedUsers, m2)
+  return sortedUsers
 
-exports.save = (users, robot) ->
-  if users?
-    users = this.sortUsersByGrade(users)
-    i = 1
-    users.map (el) ->
-      el["id"] = i++
-  robot.brain.set(USERS_KEY, users)
