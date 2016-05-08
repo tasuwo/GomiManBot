@@ -34,6 +34,10 @@ describe 'Cronに関するテスト', ->
         { date: "2016-10-03" }
         { date: "2016-10-06" }
     ]
+    getNotifyChannelStub = sinon.stub(cron, 'getNotifyChannel')
+
+    beforeEach ->
+      getNotifyChannelStub.returns(null)
 
     afterEach ->
       if clock?

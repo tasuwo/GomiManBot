@@ -2,16 +2,16 @@ as = require('./assignment.coffee')
 cronJob = require('cron').CronJob
 
 assignCronJobs = []
-NOTIFY_CHANNEL = "cleaning"
+NOTIFY_CHANNEL = "norify channel"
 
 exports.sendMessage = (robot, envelope, msg) ->
   robot.send envelope, msg
 
-exports.setNotifyChannel = (channel) ->
-  NOTIFY_CHANNEL = channel
+exports.setNotifyChannel = (channel, robot) ->
+  robot.brain.set(NOTIFY_CHANNEL, channel)
 
-exports.getNotifyChannel = () ->
-  return NOTIFY_CHANNEL
+exports.getNotifyChannel = (robot) ->
+  return robot.brain.get(NOTIFY_CHANNEL)
 
 exports.resetAssignCronJobs = () ->
   if assignCronJobs.length >0
@@ -58,7 +58,7 @@ exports.decrementDayOfCronSetting = (cronSetting) ->
 
 exports.startJobs = (robot) ->
   new cronJob('0 0 12 1 */1 *', () =>
-    envelope = room: NOTIFY_CHANNEL
+    envelope = room: (this.getNotifyChannel(robot) or "develop")
     messages = [ "@channel Check!" ]
     as.assign(robot, (resultMsgs, err) ->
       if err
@@ -78,7 +78,7 @@ exports.startAssignCronJobs = (robot, assignments) ->
     notifiedDate = this.decrementDayOfCronSetting(assignedDate)
     assignCronJobs.push(
       new cronJob(notifiedDate, () =>
-        envelope = room: NOTIFY_CHANNEL
+        envelope = room: (this.getNotifyChannel(robot) or "develop")
         this.sendMessage(robot, envelope, "@"+assignment["assign"]+" You are assigned to duty in tommorow")
       )
     )
