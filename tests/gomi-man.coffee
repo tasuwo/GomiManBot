@@ -95,8 +95,8 @@ describe 'ユーザコマンドのテスト', ->
         ['hubot', 'Save alice as B4!']
         ['alice', 'hubot users list']
         ['hubot', 'Registerd users are as follows...']
-        ['hubot', '`1` name:alice, grade:B4']
-        ['hubot', '`2` name:bob, grade:M2']
+        ['hubot', '`1` name:bob, grade:M2']
+        ['hubot', '`2` name:alice, grade:B4']
       ]
 
 
