@@ -10,9 +10,6 @@ describe 'ユーザデータに対する操作',->
   getAllStub = null
   userMock = null
 
-  before ->
-    getAllStub = sinon.stub(user, 'getAll')
-
   beforeEach ->
     usersData = [
       {"id":1, "name":"tasuwo", "grade":"M1"},
@@ -21,10 +18,11 @@ describe 'ユーザデータに対する操作',->
       {"id":4, "name":"aaa", "grade":"M1"},
     ]
     userMock = sinon.mock(user)
+    getAllStub = sinon.stub(user, 'getAll')
     getAllStub.returns(usersData)
 
-#  afterEach ->
-#    getAllStub.restore()
+  afterEach ->
+    user.getAll.restore()
 
   it "ユーザを学年順にソートする", ->
     sortedUsers = user.sortUsersByGrade(usersData)

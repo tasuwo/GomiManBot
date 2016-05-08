@@ -8,6 +8,7 @@ exports.sendMessage = (robot, envelope, msg) ->
   robot.send envelope, msg
 
 exports.setNotifyChannel = (channel, robot) ->
+  # TODO: Check channel existence
   robot.brain.set(NOTIFY_CHANNEL, channel)
 
 exports.getNotifyChannel = (robot) ->

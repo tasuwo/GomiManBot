@@ -29,7 +29,6 @@ describe '当番の割り当てに関するテスト',->
     getEventsStub = null
     getLastAssignedMonthStub = null
     getLastAssignedUserStub = null
-    assignmentMock = null
     getAllStub = null
     saveAssignmentStub = null
 
@@ -47,6 +46,7 @@ describe '当番の割り当てに関するテスト',->
       assignment.getLastAssignedMonth.restore()
       assignment.getLastAssignedUser.restore()
       users.getAll.restore()
+      assignment.saveAssignments.restore()
 
     it '正常に割り当てが行える', (done) ->
       authorizeStub.callsArgWith(1, true, null)

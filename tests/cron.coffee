@@ -36,8 +36,11 @@ describe 'Cronに関するテスト', ->
     ]
     getNotifyChannelStub = sinon.stub(cron, 'getNotifyChannel')
 
-    beforeEach ->
+    before ->
       getNotifyChannelStub.returns(null)
+
+    after ->
+      cron.getNotifyChannel.restore()
 
     afterEach ->
       if clock?
