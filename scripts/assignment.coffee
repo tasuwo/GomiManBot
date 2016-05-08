@@ -25,6 +25,11 @@ exports.getLastAssignedMonth = (robot) ->
 exports.getLastAssignedUser = (robot) ->
   return robot.brain.get(LAST_ASSIGNED_USER_KEY)
 
+exports.setLastAssignedUser = (id, robot) ->
+  unless user.getBy("id",id,robot)?
+    throw Error "There are no specified user"
+  robot.brain.set(LAST_ASSIGNED_USER_KEY, id)
+
 exports.resetAssignmentsList = (robot) ->
   robot.brain.set(ASSIGNMENTS_KEY, null)
   robot.brain.set(LAST_ASSIGNED_MONTH, null)
@@ -65,30 +70,31 @@ exports.assign = (robot, callback) ->
     users = user.getAll(robot)
     unless users?
       next "There are no users for assignment"; return
-    lastAssignedUserName = this.getLastAssignedUser(robot) or users[0]["name"]
-    assignments = this.createAssignmentsList(users, dates, lastAssignedUserName)
+    lastAssignedUserId = this.getLastAssignedUser(robot) or 1
+    assignments = this.createAssignmentsList(users, dates, lastAssignedUserId)
     this.saveAssignments(assignments, dates, robot)
     next null, false
   ], (err, preStoredflg) ->
     callback err, preStoredflg
 
-exports.createAssignmentsList = (users, dateAndDuties, lastAssignedUserName) ->
+exports.createAssignmentsList = (users, dateAndDuties, lastAssignedUserId) ->
   unless users? || dateAndDuties?
     throw Error "Invalid arguement : some arguements are empty"
   if users == [] || dateAndDuties == []
     throw Error "Invalid arguement : some arguements are empty"
-  startIndex      = null
+
+  dates = Object.keys(dateAndDuties)
+  nMembers = dates.length
   assignedMembers = null
   try
-    startIndex      = user.getIndexByName(lastAssignedUserName, users)+1
-    assignedMembers = this.extractUsersInOrder(startIndex, Object.keys(dateAndDuties).length, users)
+    startIndex = lastAssignedUserId-1
+    assignedMembers = this.extractUsersInOrder(startIndex, nMembers, users)
   catch error
     throw Error error
 
   assignments = []
-  key = Object.keys(dateAndDuties)
-  for i in [0...key.length]
-    date = key[i]
+  for i in [0...nMembers]
+    date = dates[i]
     duty = dateAndDuties[date][0]
     assignmentOfEachDate = []
     assignmentOfEachDate["date"]   = date

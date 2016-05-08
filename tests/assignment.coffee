@@ -13,9 +13,9 @@ describe '当番の割り当てに関するテスト',->
 
   before ->
     usersData = [
-      {"name":"tasuwo", "grade":"M1"},
-      {"name":"tozawa", "grade":"M2"},
-      {"name":"tetsuwo", "grade":"B4"}
+      {"id":1, "name":"tasuwo", "grade":"M1"},
+      {"id":2, "name":"tozawa", "grade":"M2"},
+      {"id":3, "name":"tetsuwo", "grade":"B4"}
     ]
     datesData = {
       "2016-04-01": ["ゴミ"],
@@ -107,7 +107,7 @@ describe '当番の割り当てに関するテスト',->
 
   context '日程へのメンバーの割り当て', ->
     it "ユーザに当番を割り当てる(先頭のメンバーから割り当て)", ->
-      assign = assignment.createAssignmentsList(usersData, datesData, usersData[2]["name"])
+      assign = assignment.createAssignmentsList(usersData, datesData, usersData[0]["id"])
       expect(assign.length==4).be.true
       expect(assign[0]["date"]=="2016-04-01").be.true
       expect(assign[1]["date"]=="2016-04-10").be.true
@@ -119,7 +119,7 @@ describe '当番の割り当てに関するテスト',->
       expect(assign[3]["assign"]=="tasuwo").be.true
 
     it "ユーザに当番を割り当てる(途中のメンバーから割り当て)", ->
-      assign = assignment.createAssignmentsList(usersData, datesData, usersData[0]["name"])
+      assign = assignment.createAssignmentsList(usersData, datesData, usersData[1]["id"])
       expect(assign.length==4).be.true
       expect(assign[0]["date"]=="2016-04-01").be.true
       expect(assign[1]["date"]=="2016-04-10").be.true

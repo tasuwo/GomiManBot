@@ -1,8 +1,10 @@
 Helper = require('hubot-test-helper')
 helper = new Helper('./../scripts/gomi-man.coffee')
+user   = require('./../scripts/user.coffee')
 
 expect = require('chai').expect
 co     = require('co')
+sinon  = require('sinon')
 
 describe 'ユーザコマンドのテスト', ->
   room = null
@@ -175,3 +177,29 @@ describe 'ユーザコマンドのテスト', ->
           ['hubot', 'Error: Assigned user name doesn\'t exist']
       ]
 
+  context 'ユーザ割り当て', ->
+    getAllStub = null
+
+    beforeEach ->
+      usersData = [
+        {"id":1, "name":"tasuwo", "grade":"M1"},
+        {"id":2, "name":"tozawa", "grade":"M2"},
+        {"id":3, "name":"tetsuwo", "grade":"B4"},
+        {"id":4, "name":"aaa", "grade":"M1"},
+      ]
+      getAllStub = sinon.stub(user, 'getAll')
+      getAllStub.returns(usersData)
+      co =>
+        yield room.user.say 'alice', 'hubot assign from 2'
+        yield room.user.say 'alice', 'hubot assign from 5'
+
+    afterEach ->
+      getAllStub.restore()
+
+    it 'ユーザ割り当てを途中から開始する', ->
+      expect(room.messages).to.eql [
+        ['alice', 'hubot assign from 2'],
+        ['hubot', 'Assign from `2` tozawa in next assignment!'],
+        ['alice', 'hubot assign from 5'],
+        ['hubot', 'Error: There are no specified user']
+      ]

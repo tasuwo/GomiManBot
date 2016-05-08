@@ -3,12 +3,6 @@ USERS_KEY = 'users'
 exports.getAll = (robot) ->
   return robot.brain.get(USERS_KEY) or null
 
-exports.getIndexByName = (name, users) ->
-  for user, index in users
-    if user["name"] == name
-      return index
-  return null
-
 exports.save = (users, robot) ->
   if users?
     users = this.sortUsersByGrade(users)

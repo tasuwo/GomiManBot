@@ -33,7 +33,7 @@ exports.getAuthUrlMsg = () ->
   access token, save it by `auth with <code>` command.'
 
 exports.getNewToken = (code, callback, robot) ->
-  oauth2Client.getToken code, (err, token) ->
+  oauth2Client.getToken code, (err, token) =>
     if err
       callback null, 'Error while trying to retrieve access token:' + err; return
     oauth2Client.setCredentials(token)

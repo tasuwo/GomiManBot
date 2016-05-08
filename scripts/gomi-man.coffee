@@ -80,6 +80,17 @@ module.exports = (robot) ->
     as.resetAssignmentsList robot
     msg.send "Successfully reset assignment!"
 
+  regex = "assign from [0-9]+"; regexes.push regex
+  robot.respond "/"+regex+"/", (msg) ->
+    id = parseInt(msg.match[0].split(" ")[3])
+    try
+      as.setLastAssignedUser(id, robot)
+      u = user.getBy("id", id, robot)
+      unless u? then throw Error "There are no specified user"
+      msg.send "Assign from `#{id}` #{u[0]["name"]} in next assignment!"
+    catch error
+      msg.send "#{error}"
+
   regex = "users list"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
     users = user.getAll(robot)

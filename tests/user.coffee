@@ -26,12 +26,6 @@ describe 'ユーザデータに対する操作',->
 #  afterEach ->
 #    getAllStub.restore()
 
-  it "名前からインデックスを取得する", ->
-    expect(user.getIndexByName("tasuwo", usersData)==0).be.true
-    expect(user.getIndexByName("tozawa", usersData)==1).be.true
-    expect(user.getIndexByName("tetsuwo", usersData)==2).be.true
-    expect(user.getIndexByName("aaa", usersData)==3).be.true
-
   it "ユーザを学年順にソートする", ->
     sortedUsers = user.sortUsersByGrade(usersData)
     expect(sortedUsers[0]["grade"]=="B4").be.true
