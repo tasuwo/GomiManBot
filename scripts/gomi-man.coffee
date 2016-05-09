@@ -34,13 +34,13 @@ module.exports = (robot) ->
   cron.startJobs(robot)
 
   # TODO : set automatically when bot is invited
-  regex = "channel set (.+)"; regexes.push regex
+  regex = "channel set (.+)$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
     channel = msg.match[0].split(" ")[3]
     cron.setNotifyChannel(channel, robot)
     msg.send "I'll send notification to channel: ##{channel}!"
 
-  regex = "channel check"; regexes.push regex
+  regex = "channel check$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
     channel = cron.getNotifyChannel(robot)
     unless channel?
@@ -49,11 +49,11 @@ module.exports = (robot) ->
       return
     msg.send "Notify channel is set to ##{channel}"
 
-  regex = "auth get url"; regexes.push regex
+  regex = "auth get url$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
     msg.send do api.getAuthUrlMsg
 
-  regex = "auth with (.+)"; regexes.push regex
+  regex = "auth with (.+)$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
     code = msg.match[0].split(" ")[3]
     api.getNewToken code, (res, err) ->
@@ -62,7 +62,7 @@ module.exports = (robot) ->
       msg.send res
     , robot
 
-  regex = "assign users"; regexes.push regex
+  regex = "assign users$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
     try
       as.assign(robot, (err, preStoredFlg) ->
@@ -83,18 +83,18 @@ module.exports = (robot) ->
     catch error
       msg.send error
 
-  regex = "assign list"; regexes.push regex
+  regex = "assign list$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
     messages = as.getAssignmentsListMsg robot
     for message in messages
       msg.send message
 
-  regex = "assign reset"; regexes.push regex
+  regex = "assign reset$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
     as.resetAssignmentsList robot
     msg.send "Successfully reset assignment!"
 
-  regex = "assign from [0-9]+"; regexes.push regex
+  regex = "assign from [0-9]+$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
     id = parseInt(msg.match[0].split(" ")[3])
     try
@@ -105,7 +105,7 @@ module.exports = (robot) ->
     catch error
       msg.send "#{error}"
 
-  regex = "users list"; regexes.push regex
+  regex = "users list$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
     users = user.getAll(robot)
     unless users?
@@ -117,7 +117,7 @@ module.exports = (robot) ->
       msg.send "`#{user["id"]}` name:#{user["name"]}, grade:#{user["grade"]}"
     )
 
-  regex = "users sort by (grade)"; regexes.push regex
+  regex = "users sort by (grade)$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
     sortMethod = msg.match[0].split(" ")[4]
     users = user.getAll(robot)
@@ -129,7 +129,7 @@ module.exports = (robot) ->
     user.save(users, robot)
     msg.send "Users were sorted by grade!"
 
-  regex = "users swap [0-9]+ [0-9]+"
+  regex = "users swap [0-9]+ [0-9]+$"
   robot.respond "/"+regex+"/", (msg) ->
     id1 = parseInt(msg.match[0].split(" ")[3])
     id2 = parseInt(msg.match[0].split(" ")[4])
@@ -139,7 +139,7 @@ module.exports = (robot) ->
     catch error
       msg.send "#{error}"
 
-  regex = "save me as (B4|M1|M2)"; regexes.push regex
+  regex = "save me as (B4|M1|M2)$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
     name  = msg.envelope.user.name
     grade = msg.match[0].split(" ")[4]
@@ -153,7 +153,7 @@ module.exports = (robot) ->
     catch error
       msg.send "#{error}"
 
-  regex = "update [0-9]+ : (.+) > (.+)"; regexes.push regex
+  regex = "update [0-9]+ : (.+) > (.+)$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
     id   = parseInt(msg.match[0].split(" ")[2])
     prop = msg.match[0].split(" ")[4]
@@ -164,7 +164,7 @@ module.exports = (robot) ->
     catch error
       msg.send "#{error}"
 
-  regex = "remove [0-9]+"; regexes.push regex
+  regex = "remove [0-9]+$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
     id = parseInt(msg.match[0].split(" ")[2])
     try
