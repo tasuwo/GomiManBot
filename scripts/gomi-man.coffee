@@ -36,7 +36,7 @@ module.exports = (robot) ->
   # TODO : set automatically when bot is invited
   regex = "channel set (.+)$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
-    channel = msg.match[0].split(" ")[3]
+    channel = msg.match[0].replace(/\s+/g, " ").split(" ")[3]
     cron.setNotifyChannel(channel, robot)
     msg.send "I'll send notification to channel: ##{channel}!"
 
@@ -55,7 +55,7 @@ module.exports = (robot) ->
 
   regex = "auth with (.+)$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
-    code = msg.match[0].split(" ")[3]
+    code = msg.match[0].replace(/\s+/g, " ").split(" ")[3]
     api.getNewToken code, (res, err) ->
       if err
         msg.send err; return
@@ -96,7 +96,7 @@ module.exports = (robot) ->
 
   regex = "assign from [0-9]+$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
-    id = parseInt(msg.match[0].split(" ")[3])
+    id = parseInt(msg.match[0].replace(/\s+/g, " ").split(" ")[3])
     try
       as.setLastAssignedUser(id, robot)
       u = user.getBy("id", id, robot)
@@ -119,7 +119,7 @@ module.exports = (robot) ->
 
   regex = "users sort by (grade)$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
-    sortMethod = msg.match[0].split(" ")[4]
+    sortMethod = msg.match[0].replace(/\s+/g, " ").split(" ")[4]
     users = user.getAll(robot)
     unless users?
       msg.send "There are no users. Please regist users by `save me as B4|M1|M2`"
@@ -131,8 +131,8 @@ module.exports = (robot) ->
 
   regex = "users swap [0-9]+ [0-9]+$"
   robot.respond "/"+regex+"/", (msg) ->
-    id1 = parseInt(msg.match[0].split(" ")[3])
-    id2 = parseInt(msg.match[0].split(" ")[4])
+    id1 = parseInt(msg.match[0].replace(/\s+/g, " ").split(" ")[3])
+    id2 = parseInt(msg.match[0].replace(/\s+/g, " ").split(" ")[4])
     try
       user.swap(id1,id2,robot)
       msg.send "Swapped user #{id1} and #{id2}!"
@@ -142,7 +142,7 @@ module.exports = (robot) ->
   regex = "save me as (B4|M1|M2)$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
     name  = msg.envelope.user.name
-    grade = msg.match[0].split(" ")[4]
+    grade = msg.match[0].replace(/\s+/g, " ").split(" ")[4]
     user_info = {
       "name": name,
       "grade": grade
@@ -156,8 +156,8 @@ module.exports = (robot) ->
   regex = "update [0-9]+ : (.+) > (.+)$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
     id   = parseInt(msg.match[0].split(" ")[2])
-    prop = msg.match[0].split(" ")[4]
-    val  = msg.match[0].split(" ")[6]
+    prop = msg.match[0].replace(/\s+/g, " ").split(" ")[4]
+    val  = msg.match[0].replace(/\s+/g, " ").split(" ")[6]
     try
       user.update(id, prop, val, robot)
       msg.send "Successfully updated!"
@@ -166,7 +166,7 @@ module.exports = (robot) ->
 
   regex = "remove [0-9]+$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
-    id = parseInt(msg.match[0].split(" ")[2])
+    id = parseInt(msg.match[0].replace(/\s+/g, " ").split(" ")[2])
     try
       user.remove(id, robot)
       msg.send "Successfully removed!"

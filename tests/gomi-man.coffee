@@ -43,6 +43,17 @@ describe 'ユーザコマンドのテスト', ->
         ['hubot', 'Error: User name is duplicate']
       ]
 
+  context '保存', ->
+    beforeEach ->
+      co =>
+        yield room.user.say 'alice', 'hubot  save me as B4'
+
+    it '先頭に空白が存在した場合にも登録できる', ->
+      expect(room.messages).to.eql [
+        ['alice', 'hubot  save me as B4']
+        ['hubot', 'Save alice as B4!']
+      ]
+
   context '表示', ->
     beforeEach ->
       co =>
