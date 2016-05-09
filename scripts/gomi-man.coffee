@@ -85,7 +85,7 @@ module.exports = (robot) ->
 
   regex = "assign list$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
-    messages = as.getAssignmentsListMsg robot
+    messages = as.getAssignmentsListMsg(as.getAssignmentsList(robot))
     for message in messages
       msg.send message
 

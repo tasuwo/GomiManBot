@@ -37,7 +37,7 @@ exports.resetAssignmentsList = (robot) ->
 exports.getAssignmentsListMsg = (assignments) ->
   unless assignments?
     return [ "There are no assignments. Please assign users to duty by `assign users` command." ]
-  msg = []
+  msg = ["Assignments list is following"]
   for assignment in assignments
     id     = assignment["id"]
     date   = assignment["date"]

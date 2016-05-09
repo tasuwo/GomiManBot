@@ -1,6 +1,7 @@
 Helper = require('hubot-test-helper')
 helper = new Helper('./../scripts/gomi-man.coffee')
 user   = require('./../scripts/user.coffee')
+as     = require('./../scripts/assignment.coffee')
 
 expect = require('chai').expect
 co     = require('co')
@@ -221,6 +222,40 @@ describe 'ユーザコマンドのテスト', ->
         ['alice', 'hubot users swap 0 10']
         ['hubot', 'Error: Specified user id doesn\'t exist']
       ].toString()
+
+  context 'ユーザ割り当て', ->
+    beforeEach ->
+      co =>
+        yield room.user.say 'alice', 'hubot assign list'
+
+    it 'ユーザ割り当てが行われていない場合はその旨を通知する', ->
+      expect(room.messages).to.eql [
+        ['alice', 'hubot assign list']
+        ['hubot', 'There are no assignments. Please assign users to duty by `assign users` command.']
+      ]
+
+  context 'ユーザ割り当て', ->
+    getAssignmentsListStub = null
+    beforeEach ->
+      assignmentsList = [
+        {"id":1, "date":"2016-10-3", "duty":"ゴミ捨て", "assign":"tozawa"},
+        {"id":2, "date":"2016-10-20", "duty":"ゴミ捨て", "assign":"tasuku"}
+      ]
+      getAssignmentsListStub = sinon.stub(as, 'getAssignmentsList')
+      getAssignmentsListStub.returns(assignmentsList)
+      co =>
+        yield room.user.say 'alice', 'hubot assign list'
+
+    afterEach ->
+      as.getAssignmentsList.restore()
+
+    it 'ユーザの割り当て表を表示する', ->
+      expect(room.messages).to.eql [
+        ['alice', 'hubot assign list']
+        ['hubot', 'Assignments list is following']
+        ['hubot', '`1` date:2016-10-3, duty:ゴミ捨て, member:tozawa']
+        ['hubot', '`2` date:2016-10-20, duty:ゴミ捨て, member:tasuku']
+      ]
 
 
   context 'ユーザ割り当て', ->
