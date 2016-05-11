@@ -5,20 +5,20 @@
 #   None
 #
 # Commands:
-#   auth get url           - Get url to retrieve authorization code
-#   auth with <code>       - Retrive access token and store it with authorization code
-#   assign users           - Retrive duties from google calendar and assign users to them
-#   assign reset           - Reset assignments
-#   assign list            - Assignments list
-#   assign from <uid>      - Set user who will be assigned to duty at first in next assignment
-#   channel set <name>     - Set notification channel (default: develop)
-#   channel check          - Check norification channel
-#   users list             - Show users saved in this app
+#   auth get url - Get url to retrieve authorization code
+#   auth with <code> - Retrive access token and store it with authorization code
+#   assign users - Retrive duties from google calendar and assign users to them
+#   assign reset - Reset assignments
+#   assign list - Assignments list
+#   assign from <uid> - Set user who will be assigned to duty at first in next assignment
+#   channel set <name> - Set notification channel (default: develop)
+#   channel check - Check norification channel
+#   users list - Show users saved in this app
 #   users sort by <method> - Sort user based on method. (method: grade)
-#   users swap <id> <id>   - Swap user position in the list
-#   save me as <grade>     - Save user who send this command as specified grade (grade: B4, M1, M2)
+#   users swap <id> <id> - Swap user position in the list
+#   save me as <grade> - Save user who send this command as specified grade (grade: B4, M1, M2)
 #   update <id> : <prop> > <value> - Update specified user's <property>'s value to <value>
-#   remove <id>            - Remove specified user
+#   remove <id> - Remove specified user
 #
 # Author:
 #   tasuwo <kamuhata.you@gmail.com>
