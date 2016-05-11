@@ -16,7 +16,7 @@
 #   users list - Show users saved in this app
 #   users sort by <method> - Sort user based on method. (method: grade)
 #   users swap <id> <id> - Swap user position in the list
-#   save me as <grade> - Save user who send this command as specified grade (grade: B4, M1, M2)
+#   save (me|<name>) as <prop>:<val>, ... - Save user who has specified name and property and value pair
 #   update <id> : <prop> > <value> - Update specified user's <property>'s value to <value>
 #   remove <id> - Remove specified user
 #
@@ -109,12 +109,17 @@ module.exports = (robot) ->
   robot.respond "/"+regex+"/", (msg) ->
     users = user.getAll(robot)
     unless users?
-      msg.send "There are no users. Please regist users by `save me as B4|M1|M2`"
+      msg.send "There are no users. Please regist users by `save
+  (me|<name>) as <prop>:<val>, ...`"
       return
     msg.send "Registerd users are as follows..."
     users.forEach((user) ->
-      name = user["name"]
-      msg.send "`#{user["id"]}` name:#{user["name"]}, grade:#{user["grade"]}"
+      list_str = "`#{user["id"]}`"
+      for key, value of user
+        if key=="id" then continue
+        list_str = list_str + " #{key}:#{user[key]},"
+      list_str = list_str.substr(0, list_str.length-1)
+      msg.send list_str
     )
 
   regex = "users sort by (grade)$"; regexes.push regex
@@ -122,7 +127,8 @@ module.exports = (robot) ->
     sortMethod = msg.match[0].replace(/\s+/g, " ").split(" ")[4]
     users = user.getAll(robot)
     unless users?
-      msg.send "There are no users. Please regist users by `save me as B4|M1|M2`"
+      msg.send "There are no users. Please regist users by `save
+  (me|<name>) as <prop>:<val>, ...`"
     switch sortMethod
       when "grade"
         users = user.sortUsersByGrade(users)
@@ -139,17 +145,26 @@ module.exports = (robot) ->
     catch error
       msg.send "#{error}"
 
-  regex = "save me as (B4|M1|M2)$"; regexes.push regex
+  regex = "save (me|.+) as (.+):(.+)(, (.+):(.+))*$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
-    name  = msg.envelope.user.name
-    grade = msg.match[0].replace(/\s+/g, " ").split(" ")[4]
-    user_info = {
-      "name": name,
-      "grade": grade
-    }
+    saver_name  = msg.envelope.user.name
+    if saver_name == "me"
+      msg.send "Your name 'me' means 'yourself' for me... please rename"
+      return
+    msg_array = msg.match[0].replace(/\s+/g, " ").split(" ")
+    saved_name = if msg_array[2]=="me" then saver_name else msg_array[2]
+    n_props = msg_array.length - 4 # [hubot, save, <name>, as].length == 4
+    props = []
+    props["name"] = saved_name
+    for i in [0...n_props]
+      prop_str = msg_array[4+i].replace(/,/g, "").split(":")
+      if prop_str[0]=="id"
+        msg.send "Cannot set id"
+        return
+      props[prop_str[0]] = prop_str[1]
     try
-      user.set(user_info, robot)
-      msg.send "Save #{name} as #{grade}!"
+      user.set(props, robot)
+      msg.send "Save #{saved_name}!"
     catch error
       msg.send "#{error}"
 
