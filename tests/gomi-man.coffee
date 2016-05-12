@@ -17,196 +17,157 @@ describe 'ユーザコマンドのテスト', ->
     room.destroy()
 
   context '保存', ->
-    beforeEach ->
+    it '自分を保存する', ->
       co =>
         yield room.user.say 'alice', 'hubot save me as grade:B4'
         yield room.user.say 'bob', 'hubot save me as grade:M1'
+        expect(room.messages).to.eql [
+          ['alice', 'hubot save me as grade:B4']
+          ['hubot', 'Save alice!']
+          ['bob', 'hubot save me as grade:M1']
+          ['hubot', 'Save bob!']
+        ]
 
-    it '自分を保存する', ->
-      expect(room.messages).to.eql [
-        ['alice', 'hubot save me as grade:B4']
-        ['hubot', 'Save alice!']
-        ['bob', 'hubot save me as grade:M1']
-        ['hubot', 'Save bob!']
-      ]
-
-  context '保存', ->
-    beforeEach ->
+    it '他人を保存する', ->
       co =>
         yield room.user.say 'alice', 'hubot save bob as grade:M1'
         yield room.user.say 'alice', 'hubot users list'
-
-    it '他人を保存する', ->
-      expect(room.messages).to.eql [
-        ['alice', 'hubot save bob as grade:M1']
-        ['hubot', 'Save bob!']
-        ['alice', 'hubot users list']
-        ['hubot', 'Registerd users are as follows...']
-        ['hubot', '`1` name:bob, grade:M1']
-      ]
-
-  context '保存', ->
-    beforeEach ->
-      co =>
-        yield room.user.say 'alice', 'hubot save me as grade:B4,
-    no:11t4054x'
-        yield room.user.say 'alice', 'hubot users list'
+        expect(room.messages).to.eql [
+          ['alice', 'hubot save bob as grade:M1']
+          ['hubot', 'Save bob!']
+          ['alice', 'hubot users list']
+          ['hubot', 'Registerd users are as follows...']
+          ['hubot', '`1` name:bob, grade:M1']
+        ]
 
     it '複数の情報を保存できる', ->
-      expect(room.messages).to.eql [
-        ['alice', 'hubot save me as grade:B4, no:11t4054x']
-        ['hubot', 'Save alice!']
-        ['alice', 'hubot users list']
-        ['hubot', 'Registerd users are as follows...']
-        ['hubot', '`1` name:alice, grade:B4, no:11t4054x']
-    ]
+      co =>
+        yield room.user.say 'alice', 'hubot save me as grade:B4, no:11t4054x'
+        yield room.user.say 'alice', 'hubot users list'
+        expect(room.messages).to.eql [
+          ['alice', 'hubot save me as grade:B4, no:11t4054x']
+          ['hubot', 'Save alice!']
+          ['alice', 'hubot users list']
+          ['hubot', 'Registerd users are as follows...']
+          ['hubot', '`1` name:alice, grade:B4, no:11t4054x']
+        ]
 
-  context '保存', ->
-    beforeEach ->
+    it 'ユーザ名が重複していた場合にはエラーを出力する', ->
       co =>
         yield room.user.say 'alice', 'hubot save me as grade:B4'
         yield room.user.say 'alice', 'hubot save me as grade:M1'
-
-    it 'ユーザ名が重複していた場合にはエラーを出力する', ->
-      expect(room.messages).to.eql [
-        ['alice', 'hubot save me as grade:B4']
-        ['hubot', 'Save alice!']
-        ['alice', 'hubot save me as grade:M1']
-        ['hubot', 'Error: User name is duplicate']
-      ]
-
-  context '保存', ->
-    beforeEach ->
-      co =>
-        yield room.user.say 'alice', 'hubot save me as grade:B4, id:3'
+        expect(room.messages).to.eql [
+          ['alice', 'hubot save me as grade:B4']
+          ['hubot', 'Save alice!']
+          ['alice', 'hubot save me as grade:M1']
+          ['hubot', 'Error: User name is duplicate']
+        ]
 
     it 'IDをセットしようとした場合にはエラー', ->
-      expect(room.messages).to.eql [
-        ['alice', 'hubot save me as grade:B4, id:3']
-        ['hubot', 'Cannot set id']
-      ]
-
-  context '保存', ->
-    beforeEach ->
       co =>
-        yield room.user.say 'me', 'hubot save me as grade:M1'
+        yield room.user.say 'alice', 'hubot save me as grade:B4, id:3'
+        expect(room.messages).to.eql [
+          ['alice', 'hubot save me as grade:B4, id:3']
+          ['hubot', 'Cannot set id']
+        ]
 
     it 'ユーザ名が"me"の場合にはエラー', ->
-      expect(room.messages).to.eql [
-        ['me', 'hubot save me as grade:M1']
-        ['hubot', 'Your name \'me\' means \'yourself\' for
-      me... please rename']
-      ]
-
-  context '保存', ->
-    beforeEach ->
       co =>
-        yield room.user.say 'alice', 'hubot  save me as grade:B4'
+        yield room.user.say 'me', 'hubot save me as grade:M1'
+        expect(room.messages).to.eql [
+          ['me', 'hubot save me as grade:M1']
+          ['hubot', 'Your name \'me\' means \'yourself\' for me... please rename']
+        ]
 
     it '先頭に空白が存在した場合にも登録できる', ->
-      expect(room.messages).to.eql [
-        ['alice', 'hubot  save me as grade:B4']
-        ['hubot', 'Save alice!']
-      ]
+      co =>
+        yield room.user.say 'alice', 'hubot  save me as grade:B4'
+        expect(room.messages).to.eql [
+          ['alice', 'hubot  save me as grade:B4']
+          ['hubot', 'Save alice!']
+        ]
 
   context '表示', ->
-    beforeEach ->
+    it '登録されたユーザ一覧を表示する', ->
       co =>
         yield room.user.say 'alice', 'hubot save me as grade:B4'
         yield room.user.say 'bob', 'hubot save me as grade:M1'
         yield room.user.say 'alice', 'hubot users list'
-
-    it '登録されたユーザ一覧を表示する', ->
-      expect(room.messages).to.eql [
-        ['alice', 'hubot save me as grade:B4']
-        ['hubot', 'Save alice!']
-        ['bob', 'hubot save me as grade:M1']
-        ['hubot', 'Save bob!']
-        ['alice', 'hubot users list']
-        ['hubot', 'Registerd users are as follows...']
-        ['hubot', '`1` name:alice, grade:B4']
-        ['hubot', '`2` name:bob, grade:M1']
-      ]
-
-  context '表示', ->
-    beforeEach ->
-      co =>
-        yield room.user.say 'alice', 'hubot users list'
+        expect(room.messages).to.eql [
+          ['alice', 'hubot save me as grade:B4']
+          ['hubot', 'Save alice!']
+          ['bob', 'hubot save me as grade:M1']
+          ['hubot', 'Save bob!']
+          ['alice', 'hubot users list']
+          ['hubot', 'Registerd users are as follows...']
+          ['hubot', '`1` name:alice, grade:B4']
+          ['hubot', '`2` name:bob, grade:M1']
+        ]
 
     it 'ユーザが存在しない場合には，登録を促すメッセージを表示する', ->
-      expect(room.messages).to.eql [
-        ['alice', 'hubot users list']
-        ['hubot', 'There are no users. Please regist users by `save me
-      as B4|M1|M2`']
-      ]
+      co =>
+        yield room.user.say 'alice', 'hubot users list'
+        expect(room.messages).to.eql [
+          ['alice', 'hubot users list']
+          ['hubot', 'There are no users. Please regist users by `save (me|<name>) as <prop>:<val>, ...`']
+        ]
 
-  context '表示', ->
-    beforeEach ->
+    it 'IDをふりわける', ->
       co =>
         yield room.user.say 'alice', 'hubot save me as grade:M1'
         yield room.user.say 'bob', 'hubot save me as grade:M2'
         yield room.user.say 'alice', 'hubot remove 1'
         yield room.user.say 'alice', 'hubot save me as grade:B4'
         yield room.user.say 'alice', 'hubot users list'
-
-    it 'IDをふりわける', ->
-      expect(room.messages).to.eql [
-        ['alice', 'hubot save me as grade:M1']
-        ['hubot', 'Save alice!']
-        ['bob', 'hubot save me as grade:M2']
-        ['hubot', 'Save bob!']
-        ['alice', 'hubot remove 1']
-        ['hubot', 'Successfully removed!']
-        ['alice', 'hubot save me as grade:B4']
-        ['hubot', 'Save alice!']
-        ['alice', 'hubot users list']
-        ['hubot', 'Registerd users are as follows...']
-        ['hubot', '`1` name:bob, grade:M2']
-        ['hubot', '`2` name:alice, grade:B4']
-      ]
-
+        expect(room.messages).to.eql [
+          ['alice', 'hubot save me as grade:M1']
+          ['hubot', 'Save alice!']
+          ['bob', 'hubot save me as grade:M2']
+          ['hubot', 'Save bob!']
+          ['alice', 'hubot remove 1']
+          ['hubot', 'Successfully removed!']
+          ['alice', 'hubot save me as grade:B4']
+          ['hubot', 'Save alice!']
+          ['alice', 'hubot users list']
+          ['hubot', 'Registerd users are as follows...']
+          ['hubot', '`1` name:bob, grade:M2']
+          ['hubot', '`2` name:alice, grade:B4']
+        ]
 
   context '更新', ->
-    beforeEach ->
+    it 'ユーザ情報を更新する', ->
       co =>
         yield room.user.say 'alice', 'hubot save me as grade:B4'
         yield room.user.say 'alice', 'hubot update 1 : name > bob'
         yield room.user.say 'alice', 'hubot users list'
+        expect(room.messages).to.eql [
+          ['alice', 'hubot save me as grade:B4']
+          ['hubot', 'Save alice!']
+          ['alice', 'hubot update 1 : name > bob']
+          ['hubot', 'Successfully updated!']
+          ['alice', 'hubot users list']
+          ['hubot', 'Registerd users are as follows...']
+          ['hubot', '`1` name:bob, grade:B4']
+        ]
 
-    it 'ユーザ情報を更新する', ->
-      expect(room.messages).to.eql [
-        ['alice', 'hubot save me as grade:B4']
-        ['hubot', 'Save alice!']
-        ['alice', 'hubot update 1 : name > bob']
-        ['hubot', 'Successfully updated!']
-        ['alice', 'hubot users list']
-        ['hubot', 'Registerd users are as follows...']
-        ['hubot', '`1` name:bob, grade:B4']
-      ]
-  context '更新', ->
-    beforeEach ->
+    it '重複した名前に更新しようとした場合にはエラーを出力する', ->
       co =>
         yield room.user.say 'alice', 'hubot save me as grade:B4'
         yield room.user.say 'alice', 'hubot update 1 : name >
         alice'
-
-    it '重複した名前に更新しようとした場合にはエラーを出力する', ->
-      expect(room.messages).to.eql [
+        expect(room.messages).to.eql [
           ['alice', 'hubot save me as grade:B4']
           ['hubot', 'Save alice!']
           ['alice', 'hubot update 1 : name > alice']
           ['hubot', 'Error: User name is duplicate']
-      ]
+        ]
 
-  context '更新', ->
-    beforeEach ->
+    it '存在しないプロパティを更新しようとした場合はエラーを出力する', ->
       co =>
         yield room.user.say 'alice', 'hubot save me as grade:B4'
         yield room.user.say 'alice', 'hubot update 1 : test >
         alice'
-
-    it '存在しないプロパティを更新しようとした場合はエラーを出力する', ->
-      expect(room.messages).to.eql [
+        expect(room.messages).to.eql [
           ['alice', 'hubot save me as grade:B4']
           ['hubot', 'Save alice!']
           ['alice', 'hubot update 1 : test > alice']
@@ -214,39 +175,33 @@ describe 'ユーザコマンドのテスト', ->
       ]
 
   context '削除', ->
-    beforeEach ->
+    it 'ユーザを削除する(すべてのユーザが削除されると，usersがnullにな
+      る)', ->
       co =>
         yield room.user.say 'alice', 'hubot save me as grade:B4'
         yield room.user.say 'alice', 'hubot remove 1'
         yield room.user.say 'alice', 'hubot users list'
-
-    it 'ユーザを削除する(すべてのユーザが削除されると，usersがnullにな
-      る)', ->
-      expect(room.messages).to.eql [
+        expect(room.messages).to.eql [
           ['alice', 'hubot save me as grade:B4']
           ['hubot', 'Save alice!']
           ['alice', 'hubot remove 1']
           ['hubot', 'Successfully removed!']
           ['alice', 'hubot users list']
-          ['hubot', 'There are no users. Please regist users by `save me
-      as B4|M1|M2`']
-      ]
-
-  context '削除', ->
-    beforeEach ->
-      co =>
-        yield room.user.say 'alice', 'hubot remove 1'
+          ['hubot', 'There are no users. Please regist users by `save (me|<name>) as <prop>:<val>, ...`']
+        ]
 
     it '存在しないユーザを削除しようとしたらエラーを出力する', ->
-      expect(room.messages).to.eql [
+      co =>
+        yield room.user.say 'alice', 'hubot remove 1'
+        expect(room.messages).to.eql [
           ['alice', 'hubot remove 1']
           ['hubot', 'Error: Assigned user name doesn\'t exist']
-      ]
+        ]
 
   context '交換', ->
     getAllStub = null
 
-    beforeEach ->
+    it 'ユーザの順番を交換する', ->
       usersData = [
         {"id":1, "name":"tasuwo", "grade":"M1"},
         {"id":2, "name":"tozawa", "grade":"M2"},
@@ -259,38 +214,34 @@ describe 'ユーザコマンドのテスト', ->
         yield room.user.say 'alice', 'hubot users swap 2 4'
         yield room.user.say 'alice', 'hubot users list'
         yield room.user.say 'alice', 'hubot users swap 0 10'
-
-    afterEach ->
+        expect(room.messages.toString()).to.equal [
+          ['alice', 'hubot users swap 2 4']
+          ['hubot', 'Swapped user 2 and 4!']
+          ['alice', 'hubot users list']
+          ['hubot', 'Registerd users are as follows...']
+          ['hubot', '`1` name:tasuwo, grade:M1']
+          ['hubot', '`2` name:aaa, grade:M1']
+          ['hubot', '`3` name:tetsuwo, grade:B4']
+          ['hubot', '`4` name:tozawa, grade:M2']
+          ['alice', 'hubot users swap 0 10']
+          ['hubot', 'Error: Specified user id doesn\'t exist']
+        ].toString()
       user.getAll.restore()
-
-    it 'ユーザの順番を交換する', ->
-      expect(room.messages.toString()).to.equal [
-        ['alice', 'hubot users swap 2 4']
-        ['hubot', 'Swapped user 2 and 4!']
-        ['alice', 'hubot users list']
-        ['hubot', 'Registerd users are as follows...']
-        ['hubot', '`1` name:tasuwo, grade:M1']
-        ['hubot', '`2` name:aaa, grade:M1']
-        ['hubot', '`3` name:tetsuwo, grade:B4']
-        ['hubot', '`4` name:tozawa, grade:M2']
-        ['alice', 'hubot users swap 0 10']
-        ['hubot', 'Error: Specified user id doesn\'t exist']
-      ].toString()
-
-  context 'ユーザ割り当て', ->
-    beforeEach ->
-      co =>
-        yield room.user.say 'alice', 'hubot assign list'
-
-    it 'ユーザ割り当てが行われていない場合はその旨を通知する', ->
-      expect(room.messages).to.eql [
-        ['alice', 'hubot assign list']
-        ['hubot', 'There are no assignments. Please assign users to duty by `assign users` command.']
-      ]
 
   context 'ユーザ割り当て', ->
     getAssignmentsListStub = null
-    beforeEach ->
+    getAllStub = null
+
+    it 'ユーザ割り当てが行われていない場合はその旨を通知する', (done)->
+      co =>
+        yield room.user.say 'alice', 'hubot assign list'
+        yield done()
+        expect(room.messages).to.eql [
+          ['alice', 'hubot assign list']
+          ['hubot', 'There are no assignments. Please assign users to duty by `assign users` command.']
+        ]
+
+    it 'ユーザの割り当て表を表示する', ->
       assignmentsList = [
         {"id":1, "date":"2016-10-3", "duty":"ゴミ捨て", "assign":"tozawa"},
         {"id":2, "date":"2016-10-20", "duty":"ゴミ捨て", "assign":"tasuku"}
@@ -299,23 +250,15 @@ describe 'ユーザコマンドのテスト', ->
       getAssignmentsListStub.returns(assignmentsList)
       co =>
         yield room.user.say 'alice', 'hubot assign list'
-
-    afterEach ->
+        expect(room.messages).to.eql [
+          ['alice', 'hubot assign list']
+          ['hubot', 'Assignments list is following']
+          ['hubot', '`1` date:2016-10-3, duty:ゴミ捨て, member:tozawa']
+          ['hubot', '`2` date:2016-10-20, duty:ゴミ捨て, member:tasuku']
+        ]
       as.getAssignmentsList.restore()
 
-    it 'ユーザの割り当て表を表示する', ->
-      expect(room.messages).to.eql [
-        ['alice', 'hubot assign list']
-        ['hubot', 'Assignments list is following']
-        ['hubot', '`1` date:2016-10-3, duty:ゴミ捨て, member:tozawa']
-        ['hubot', '`2` date:2016-10-20, duty:ゴミ捨て, member:tasuku']
-      ]
-
-
-  context 'ユーザ割り当て', ->
-    getAllStub = null
-
-    beforeEach ->
+    it 'ユーザ割り当てを途中から開始する', (done)->
       usersData = [
         {"id":1, "name":"tasuwo", "grade":"M1"},
         {"id":2, "name":"tozawa", "grade":"M2"},
@@ -327,32 +270,27 @@ describe 'ユーザコマンドのテスト', ->
       co =>
         yield room.user.say 'alice', 'hubot assign from 2'
         yield room.user.say 'alice', 'hubot assign from 5'
-
-    afterEach ->
+        yield done()
+        expect(room.messages).to.eql [
+          ['alice', 'hubot assign from 2'],
+          ['hubot', 'Assign from `2` tozawa in next assignment!'],
+          ['alice', 'hubot assign from 5'],
+          ['hubot', 'Error: There are no specified user']
+        ]
       user.getAll.restore()
-
-    it 'ユーザ割り当てを途中から開始する', ->
-      expect(room.messages).to.eql [
-        ['alice', 'hubot assign from 2'],
-        ['hubot', 'Assign from `2` tozawa in next assignment!'],
-        ['alice', 'hubot assign from 5'],
-        ['hubot', 'Error: There are no specified user']
-      ]
 
   context 'チャンネル設定', ->
     beforeEach ->
+    it '通知用チャンネルを保存する', ->
       co =>
         yield room.user.say 'alice', 'hubot channel check'
         yield room.user.say 'alice', 'hubot channel set develop'
         yield room.user.say 'alice', 'hubot channel check'
-
-    it '通知用チャンネルを保存する', ->
-      expect(room.messages).to.eql [
-        ['alice', 'hubot channel check']
-        ['hubot', 'No channel registered. Please save channel by
-      `channel set <channel name>` command.']
-        ['alice', 'hubot channel set develop']
-        ['hubot', 'I\'ll send notification to channel: #develop!']
-        ['alice', 'hubot channel check']
-        ['hubot', 'Notify channel is set to #develop']
-      ]
+        expect(room.messages).to.eql [
+          ['alice', 'hubot channel check']
+          ['hubot', 'No channel registered. Please save channel by `channel set <channel name>` command.']
+          ['alice', 'hubot channel set develop']
+          ['hubot', 'I\'ll send notification to channel: #develop!']
+          ['alice', 'hubot channel check']
+          ['hubot', 'Notify channel is set to #develop']
+        ]
