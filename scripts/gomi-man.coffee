@@ -63,7 +63,7 @@ module.exports = (robot) ->
       qs: decodeParams
     }, (err, res, body) ->
       if err then console.log(err); return
-      console.log(res)
+      redirectUrl = decodeURIComponent(res.request.uri.href)
 
   regex = "auth get url$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
