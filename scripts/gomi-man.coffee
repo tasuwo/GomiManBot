@@ -28,6 +28,7 @@ user = require("./user.coffee")
 async = require("async")
 cron = require("./cron.coffee")
 as = require("./assignment.coffee")
+request = require("request")
 
 module.exports = (robot) ->
   regexes = []
@@ -48,6 +49,21 @@ module.exports = (robot) ->
   set <channel name>` command."
       return
     msg.send "Notify channel is set to ##{channel}"
+
+  regex = "auth auto$"; regexes.push regexes.push regex
+  robot.respond "/"+regex+"/", (msg) ->
+    url = api.getAuthUrl()
+    params = api.parseUrl(url)
+    decodeParams = []
+    for key, value of params
+      decodeParams[key] = decodeURIComponent(value)
+
+    request {
+      url: "https://accounts.google.com/o/oauth2/auth",
+      qs: decodeParams
+    }, (err, res, body) ->
+      if err then console.log(err); return
+      console.log(res)
 
   regex = "auth get url$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->

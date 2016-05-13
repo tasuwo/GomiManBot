@@ -25,9 +25,11 @@ exports.authorize = (robot, callback) ->
     oauth2Client.setCredentials(JSON.parse(token))
     callback oauth2Client, null
 
+exports.getAuthUrl = () ->
+  return oauth2Client.generateAuthUrl(access_type: 'offline', scope: SCOPES)
+
 exports.getAuthUrlMsg = () ->
-  authUrl = oauth2Client.generateAuthUrl(access_type: 'offline', scope: SCOPES)
-  return 'Authorize this app by visiting this url: ' + authUrl +
+  return 'Authorize this app by visiting this url: ' + this.getAuthUrl() +
     '\nAfter vissiting the url, you will be able to retrive a code
   query parameter from the redirect url. Next, use it and retrive
   access token, save it by `auth with <code>` command.'
@@ -85,3 +87,10 @@ exports.getEvents = (auth, tags, callback) ->
   ], (err, events) ->
     if err? then callback null, err
     callback events
+
+# TODO: Clean code and decode uri components
+# TODO: Error handling
+exports.parseUrl = ( url = location.href ) ->
+  params = {}
+  ( ( parts = part.split( "=" ) ) && params[ parts[0] ] = parts[1] for part in ( url.split "?" ).pop().split "&" if url.indexOf( "?" ) != -1 ) && params || {}
+
