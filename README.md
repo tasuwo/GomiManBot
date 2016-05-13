@@ -5,13 +5,13 @@ Gomi-man-bot retrieve duties from google calendar, assign users to them, and not
 [日本語ドキュメントはこちら](./README_JA.md)
 
 # Usage
-Send `help` to gomi-man-bot and you'll get enable command discriptions.
+Send `help` to gomi-man-bot and you'll get discriptions about enable commands.
 The example procedure is following.
 
 1. Create duty on google calendar. That time, Please add prefix `clean:` to dutie's name.
-2. Save user to the app:         `save me as <B4|M1|M2>`
+2. Save user to the app: `save me as <B4|M1|M2>`
 3. Set channel for notification: `channel set <name>`
-3. Assign users to duties:       `assign users` (this procedure is automatically execute in the first day in the month)
+3. Assign users to duties: `assign users` (this procedure is automatically execute in the first day in the month)
 4. You'll get notification in the day before the assigned day through the specified channel!
 
 # Preparation
@@ -20,7 +20,7 @@ The example procedure is following.
 First you need to get client secret and client id for google api authorization on slack bot.
 
 1. Through [Google api console](https://console.developers.google.com), create project, enable google calendar api, and get authorization information (client secret, client id)
-2. Create `auth.json` like following under a scripts directory
+2. Create `auth.json` under a scripts directory
 
 ``` json
 {
