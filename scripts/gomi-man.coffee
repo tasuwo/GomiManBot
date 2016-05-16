@@ -159,7 +159,7 @@ module.exports = (robot) ->
     msg_array = msg.match[0].replace(/\s+/g, " ").split(" ")
     saved_name = if msg_array[2]=="me" then saver_name else msg_array[2]
     n_props = msg_array.length - 4 # [hubot, save, <name>, as].length == 4
-    props = []
+    props = new Object()
     props["name"] = saved_name
     for i in [0...n_props]
       prop_str = msg_array[4+i].replace(/,/g, "").split(":")
