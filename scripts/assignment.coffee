@@ -42,9 +42,9 @@ exports.swap = (id1, id2, robot) ->
   assignments = this.getAssignmentsList(robot)
   unless assignments?
     return [ "There are no assignments. Please assign users to duty by `assign users` command." ]
-  tmp = assignments[id1-1]
-  assignments[id1-1] = assignments[id2-1]
-  assignments[id2-1] = tmp
+  tmp = assignments[id1-1]["assign"]
+  assignments[id1-1]["assign"] = assignments[id2-1]["assign"]
+  assignments[id2-1]["assign"] = tmp
   this.setAssignmentsList(assignments, robot)
 
 exports.getAssignmentsListMsg = (assignments) ->
