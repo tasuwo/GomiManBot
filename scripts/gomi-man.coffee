@@ -78,7 +78,6 @@ module.exports = (robot) ->
         for message in messages
           msg.send message
 
-        cron.resetAssignCronJobs
         cron.startAssignCronJobs(robot, as.getAssignmentsList(robot))
       )
     catch error
@@ -96,6 +95,7 @@ module.exports = (robot) ->
     id2 = parseInt(msg.match[0].replace(/\s+/g, " ").split(" ")[4])
     try
       as.swap(id1, id2, robot)
+      cron.startAssignCronJobs(robot, as.getAssignmentsList(robot))
       msg.send "Successfully swapped!"
     catch error
       msg.send error

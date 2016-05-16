@@ -74,6 +74,7 @@ exports.startJobs = (robot) ->
 exports.startAssignCronJobs = (robot, assignments) ->
   unless assignments?
     throw Error "There are no assignment for creating cron jobs"
+  this.resetAssignCronJobs()
   for assignment in assignments
     assignedDate = this.translateDateToCronSetting(assignment["date"])
     notifiedDate = this.decrementDayOfCronSetting(assignedDate)
