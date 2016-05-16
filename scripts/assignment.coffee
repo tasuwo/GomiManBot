@@ -105,11 +105,11 @@ exports.createAssignmentsList = (users, dateAndDuties, lastAssignedUserId) ->
   catch error
     throw Error error
 
-  assignments = new Object()
+  assignments = []
   for i in [0...nMembers]
     date = dates[i]
     duty = dateAndDuties[date][0]
-    assignmentOfEachDate = []
+    assignmentOfEachDate = new Object()
     assignmentOfEachDate["date"]   = date
     assignmentOfEachDate["duty"]   = duty
     assignmentOfEachDate["assign"] = assignedMembers[i]["name"]
