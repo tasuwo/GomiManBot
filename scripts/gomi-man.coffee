@@ -10,6 +10,7 @@
 #   assign users - Retrive duties from google calendar and assign users to them
 #   assign reset - Reset assignments
 #   assign list - Assignments list
+#   assign swap `id` `id` - Swap users in assignments list
 #   assign from `uid` - Set user who will be assigned to duty at first in next assignment
 #   channel set `name` - Set notification channel (default: develop)
 #   channel check - Check norification channel
@@ -88,6 +89,16 @@ module.exports = (robot) ->
     messages = as.getAssignmentsListMsg(as.getAssignmentsList(robot))
     for message in messages
       msg.send message
+
+  regex = "assign swap [0-9]+ [0-9]+"
+  robot.respond "/"+regex+"/", (msg) ->
+    id1 = parseInt(msg.match[0].replace(/\s+/g, " ").split(" ")[3])
+    id2 = parseInt(msg.match[0].replace(/\s+/g, " ").split(" ")[4])
+    try
+      as.swap(id1, id2, robot)
+      msg.send "Successfully swapped!"
+    catch error
+      msg.send error
 
   regex = "assign reset$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->

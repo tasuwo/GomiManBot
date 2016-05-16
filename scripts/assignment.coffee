@@ -9,12 +9,16 @@ LAST_ASSIGNED_USER_KEY = 'last_assigned_user'
 
 exports.saveAssignments = (assignments, dates, robot) ->
   if assignments?
+    this.setAssignmentsList(assignments, robot)
+    robot.brain.set(LAST_ASSIGNED_USER_KEY, assignments[assignments.length-1]["assign"])
+    robot.brain.set(LAST_ASSIGNED_MONTH, parseInt(Object.keys(dates)[0].split("-")[1]))
+
+exports.setAssignmentsList = (assignments, robot) ->
+  if assignments?
     i = 1
     assignments.map (el) ->
       el["id"] = i++
     robot.brain.set(ASSIGNMENTS_KEY, assignments)
-    robot.brain.set(LAST_ASSIGNED_USER_KEY, assignments[assignments.length-1]["assign"])
-    robot.brain.set(LAST_ASSIGNED_MONTH, parseInt(Object.keys(dates)[0].split("-")[1]))
 
 exports.getAssignmentsList = (robot) ->
   return robot.brain.get(ASSIGNMENTS_KEY) or null
@@ -33,6 +37,15 @@ exports.setLastAssignedUser = (id, robot) ->
 exports.resetAssignmentsList = (robot) ->
   robot.brain.set(ASSIGNMENTS_KEY, null)
   robot.brain.set(LAST_ASSIGNED_MONTH, null)
+
+exports.swap = (id1, id2, robot) ->
+  assignments = this.getAssignmentsList(robot)
+  unless assignments?
+    return [ "There are no assignments. Please assign users to duty by `assign users` command." ]
+  tmp = assignments[id1]
+  assignments[id1] = assignments[id2]
+  assignments[id2] = tmp
+  this.setAssignmentsList(assignments, robot)
 
 exports.getAssignmentsListMsg = (assignments) ->
   unless assignments?
