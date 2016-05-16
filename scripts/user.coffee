@@ -41,8 +41,8 @@ exports.update = (id, prop, value, robot) ->
     throw Error "There are no specified user"
   user  = update_user_info[0]
   index = update_user_info[1]
-  unless user[prop]?
-    throw Error "Assigned property doesn't exist"
+  # unless user[prop]?
+  #   throw Error "Assigned property doesn't exist"
   user[prop] = value
   users = this.getAll(robot)
   users[index] = user

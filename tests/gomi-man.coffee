@@ -162,17 +162,17 @@ describe 'ユーザコマンドのテスト', ->
           ['hubot', 'Error: User name is duplicate']
         ]
 
-    it '存在しないプロパティを更新しようとした場合はエラーを出力する', ->
-      co =>
-        yield room.user.say 'alice', 'hubot save me as grade:B4'
-        yield room.user.say 'alice', 'hubot users update 1 : test >
-        alice'
-        expect(room.messages).to.eql [
-          ['alice', 'hubot save me as grade:B4']
-          ['hubot', 'Save alice!']
-          ['alice', 'hubot users update 1 : test > alice']
-          ['hubot', 'Error: Assigned property doesn\'t exist']
-      ]
+    # it '存在しないプロパティを更新しようとした場合はエラーを出力する', ->
+    #   co =>
+    #     yield room.user.say 'alice', 'hubot save me as grade:B4'
+    #     yield room.user.say 'alice', 'hubot users update 1 : test >
+    #     alice'
+    #     expect(room.messages).to.eql [
+    #       ['alice', 'hubot save me as grade:B4']
+    #       ['hubot', 'Save alice!']
+    #       ['alice', 'hubot users update 1 : test > alice']
+    #       ['hubot', 'Error: Assigned property doesn\'t exist']
+    #   ]
 
   context '削除', ->
     it 'ユーザを削除する(すべてのユーザが削除されると，usersがnullにな
