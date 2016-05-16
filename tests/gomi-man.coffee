@@ -116,7 +116,7 @@ describe 'ユーザコマンドのテスト', ->
       co =>
         yield room.user.say 'alice', 'hubot save me as grade:M1'
         yield room.user.say 'bob', 'hubot save me as grade:M2'
-        yield room.user.say 'alice', 'hubot remove 1'
+        yield room.user.say 'alice', 'hubot users remove 1'
         yield room.user.say 'alice', 'hubot save me as grade:B4'
         yield room.user.say 'alice', 'hubot users list'
         expect(room.messages).to.eql [
@@ -124,7 +124,7 @@ describe 'ユーザコマンドのテスト', ->
           ['hubot', 'Save alice!']
           ['bob', 'hubot save me as grade:M2']
           ['hubot', 'Save bob!']
-          ['alice', 'hubot remove 1']
+          ['alice', 'hubot users remove 1']
           ['hubot', 'Successfully removed!']
           ['alice', 'hubot save me as grade:B4']
           ['hubot', 'Save alice!']
@@ -138,12 +138,12 @@ describe 'ユーザコマンドのテスト', ->
     it 'ユーザ情報を更新する', ->
       co =>
         yield room.user.say 'alice', 'hubot save me as grade:B4'
-        yield room.user.say 'alice', 'hubot update 1 : name > bob'
+        yield room.user.say 'alice', 'hubot users update 1 : name > bob'
         yield room.user.say 'alice', 'hubot users list'
         expect(room.messages).to.eql [
           ['alice', 'hubot save me as grade:B4']
           ['hubot', 'Save alice!']
-          ['alice', 'hubot update 1 : name > bob']
+          ['alice', 'hubot users update 1 : name > bob']
           ['hubot', 'Successfully updated!']
           ['alice', 'hubot users list']
           ['hubot', 'Registerd users are as follows...']
@@ -153,24 +153,24 @@ describe 'ユーザコマンドのテスト', ->
     it '重複した名前に更新しようとした場合にはエラーを出力する', ->
       co =>
         yield room.user.say 'alice', 'hubot save me as grade:B4'
-        yield room.user.say 'alice', 'hubot update 1 : name >
+        yield room.user.say 'alice', 'hubot users update 1 : name >
         alice'
         expect(room.messages).to.eql [
           ['alice', 'hubot save me as grade:B4']
           ['hubot', 'Save alice!']
-          ['alice', 'hubot update 1 : name > alice']
+          ['alice', 'hubot users update 1 : name > alice']
           ['hubot', 'Error: User name is duplicate']
         ]
 
     it '存在しないプロパティを更新しようとした場合はエラーを出力する', ->
       co =>
         yield room.user.say 'alice', 'hubot save me as grade:B4'
-        yield room.user.say 'alice', 'hubot update 1 : test >
+        yield room.user.say 'alice', 'hubot users update 1 : test >
         alice'
         expect(room.messages).to.eql [
           ['alice', 'hubot save me as grade:B4']
           ['hubot', 'Save alice!']
-          ['alice', 'hubot update 1 : test > alice']
+          ['alice', 'hubot users update 1 : test > alice']
           ['hubot', 'Error: Assigned property doesn\'t exist']
       ]
 
@@ -179,12 +179,12 @@ describe 'ユーザコマンドのテスト', ->
       る)', ->
       co =>
         yield room.user.say 'alice', 'hubot save me as grade:B4'
-        yield room.user.say 'alice', 'hubot remove 1'
+        yield room.user.say 'alice', 'hubot users remove 1'
         yield room.user.say 'alice', 'hubot users list'
         expect(room.messages).to.eql [
           ['alice', 'hubot save me as grade:B4']
           ['hubot', 'Save alice!']
-          ['alice', 'hubot remove 1']
+          ['alice', 'hubot users remove 1']
           ['hubot', 'Successfully removed!']
           ['alice', 'hubot users list']
           ['hubot', 'There are no users. Please regist users by `save (me|<name>) as <prop>:<val>, ...`']
@@ -192,9 +192,9 @@ describe 'ユーザコマンドのテスト', ->
 
     it '存在しないユーザを削除しようとしたらエラーを出力する', ->
       co =>
-        yield room.user.say 'alice', 'hubot remove 1'
+        yield room.user.say 'alice', 'hubot users remove 1'
         expect(room.messages).to.eql [
-          ['alice', 'hubot remove 1']
+          ['alice', 'hubot users remove 1']
           ['hubot', 'Error: Assigned user name doesn\'t exist']
         ]
 

@@ -38,10 +38,10 @@ describe 'ユーザデータに対する操作',->
     tmpData[2]["stNo"]="11t4054x"
     tmpData[3]["stNo"]="16nm701x"
     sortedUsers = user.sortUsersByStNo(usersData)
-    expect(sortedUsers[0]["stNo"]=="15nm722x").be.true
-    expect(sortedUsers[1]["stNo"]=="16nm722x").be.true
-    expect(sortedUsers[2]["stNo"]=="16nm701x").be.true
-    expect(sortedUsers[3]["stNo"]=="11t4054x").be.true
+    expect(sortedUsers[0]["stNo"]=="11t4054x").be.true
+    expect(sortedUsers[1]["stNo"]=="16nm701x").be.true
+    expect(sortedUsers[2]["stNo"]=="16nm722x").be.true
+    expect(sortedUsers[3]["stNo"]=="15nm722x").be.true
 
   it "ユーザ情報から任意のユーザを取得する", ->
     # TODO: 順番に依存しない形式への書き換え

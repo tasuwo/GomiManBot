@@ -17,8 +17,8 @@
 #   users sort by <method> - Sort user based on method. (method: grade, stNo, reverse)
 #   users swap <id> <id> - Swap user position in the list
 #   save (me|<name>) as <prop>:<val>, ... - Save user who has specified name and property and value pair
-#   update <id> : <prop> > <value> - Update specified user's <property>'s value to <value>
-#   remove <id> - Remove specified user
+#   users update <id> : <prop> > <value> - Update specified user's <property>'s value to <value>
+#   users remove <id> - Remove specified user
 #
 # Author:
 #   tasuwo <kamuhata.you@gmail.com>
@@ -173,20 +173,20 @@ module.exports = (robot) ->
     catch error
       msg.send "#{error}"
 
-  regex = "update [0-9]+ : (.+) > (.+)$"; regexes.push regex
+  regex = "users update [0-9]+ : (.+) > (.+)$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
-    id   = parseInt(msg.match[0].split(" ")[2])
-    prop = msg.match[0].replace(/\s+/g, " ").split(" ")[4]
-    val  = msg.match[0].replace(/\s+/g, " ").split(" ")[6]
+    id   = parseInt(msg.match[0].split(" ")[3])
+    prop = msg.match[0].replace(/\s+/g, " ").split(" ")[5]
+    val  = msg.match[0].replace(/\s+/g, " ").split(" ")[7]
     try
       user.update(id, prop, val, robot)
       msg.send "Successfully updated!"
     catch error
       msg.send "#{error}"
 
-  regex = "remove [0-9]+$"; regexes.push regex
+  regex = "users remove [0-9]+$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
-    id = parseInt(msg.match[0].replace(/\s+/g, " ").split(" ")[2])
+    id = parseInt(msg.match[0].replace(/\s+/g, " ").split(" ")[3])
     try
       user.remove(id, robot)
       msg.send "Successfully removed!"
