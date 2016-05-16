@@ -14,7 +14,7 @@
 #   channel set <name> - Set notification channel (default: develop)
 #   channel check - Check norification channel
 #   users list - Show users saved in this app
-#   users sort by <method> - Sort user based on method. (method: grade)
+#   users sort by <method> - Sort user based on method. (method: grade, stNo, reverse)
 #   users swap <id> <id> - Swap user position in the list
 #   save (me|<name>) as <prop>:<val>, ... - Save user who has specified name and property and value pair
 #   update <id> : <prop> > <value> - Update specified user's <property>'s value to <value>
@@ -131,6 +131,10 @@ module.exports = (robot) ->
     switch sortMethod
       when "grade"
         users = user.sortUsersByGrade(users)
+      when "stNo"
+        users = user.sortUsersByStNo(users)
+      when "reverse"
+        users = users.reverse()
       else
         msg.send "There are no method for sort"; return
     user.save(users, robot)

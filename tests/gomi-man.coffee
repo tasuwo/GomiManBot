@@ -284,10 +284,10 @@ describe 'ユーザコマンドのテスト', ->
 
     beforeEach ->
       usersData = [
-        {"id":1, "name":"tasuwo", "grade":"M1"},
-        {"id":2, "name":"tozawa", "grade":"M2"},
-        {"id":3, "name":"tetsuwo", "grade":"B4"},
-        {"id":4, "name":"aaa", "grade":"M1"},
+        {"id":1, "name":"tasuwo", "grade":"M1", "stNo":"16nm722x"},
+        {"id":2, "name":"tozawa", "grade":"M2", "stNo":"15nm722x"},
+        {"id":3, "name":"tetsuwo", "grade":"B4", "stNo":"11t4054x"},
+        {"id":4, "name":"aaa", "grade":"M1", "stNo":"16nm701x"},
       ]
       getAllStub = sinon.stub(user, 'getAll')
       getAllStub.returns(usersData)

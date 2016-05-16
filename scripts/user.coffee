@@ -93,3 +93,91 @@ exports.sortUsersByGrade = (users) ->
   Array.prototype.push.apply(sortedUsers, m2)
   return sortedUsers
 
+exports.sortUsersByStNo = (users) ->
+  unless users?
+    throw Error "Users are empty"
+  usersList = []
+  for user in users
+    unless "stNo" of user
+      throw Error "Some users doesn't have property 'stNo'"
+    usersList.push(new this.StudentNumber(user["stNo"]))
+  sortedUsers = []
+  sortedStNumbers = bubbleSort(usersList)
+  for stNo in sortedStNumbers
+    for user in users
+      if user["stNo"]==stNo.str
+        sortedUsers.push user
+        break
+  return sortedUsers.reverse()
+
+# TODO: clean code
+bubbleSort = (array) ->
+  return array  if not Array.isArray(array) or array.length < 2
+  swap = (array, first, second) ->
+    temp = array[first]
+    array[first] = array[second]
+    array[second] = temp
+    array
+  i = undefined
+  l = undefined
+  i = 0
+  while i < array.length
+    l = i
+    swap array, l, l + 1  while l-- and array[l].earlierThan array[l + 1]
+    i++
+  array
+
+exports.StudentNumber = class StudentNumber
+  constructor: (stNo) ->
+    if res = this.matchBStNo stNo
+      @str    = res[0]
+      @degree = "bachelor"
+      @year   = parseInt(res[1])
+      @no     = parseInt(res[3])
+    else if res = this.matchMStNo stNo
+      @str    = res[0]
+      @degree = "master"
+      @year   = parseInt(res[1])
+      @no     = parseInt(res[3])
+    else
+      @degree = null
+
+  compareTo: (stNo) =>
+    unless stNo instanceof StudentNumber
+      throw Error "Invarid arguement"
+    return @degree==stNo.degree && @year==stNo.year && @no==stNo.no
+
+  earlierThan: (stNo) =>
+    unless stNo instanceof StudentNumber
+      throw Error "Invarid arguement"
+    if this.compareTo stNo
+      return false
+    if @degree != stNo.degree
+      if @degree=="master"
+        return false
+      else
+        return true
+    else
+      if @year!=stNo.year
+        return @year>stNo.year
+      else
+        return @no<stNo.no
+
+
+  matchBStNo: (stNo) =>
+    bRegex = ///^
+      ([0-9]{2})
+      (T|t)
+      ([0-9]{4})
+      ([a-zA-Z]{1})
+      $///i
+    return stNo.match bRegex
+
+  matchMStNo: (stNo) =>
+    mRegex = ///^
+      ([0-9]{2})
+      (NM|nm)
+      ([0-9]{3})
+      ([a-zA-Z]{1})
+      $///i
+    return stNo.match mRegex

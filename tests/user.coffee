@@ -31,6 +31,18 @@ describe 'ユーザデータに対する操作',->
     expect(sortedUsers[2]["grade"]=="M1").be.true
     expect(sortedUsers[3]["grade"]=="M2").be.true
 
+  it "ユーザを学籍番号順にソートする", ->
+    tmpData = usersData
+    tmpData[0]["stNo"]="16nm722x"
+    tmpData[1]["stNo"]="15nm722x"
+    tmpData[2]["stNo"]="11t4054x"
+    tmpData[3]["stNo"]="16nm701x"
+    sortedUsers = user.sortUsersByStNo(usersData)
+    expect(sortedUsers[0]["stNo"]=="15nm722x").be.true
+    expect(sortedUsers[1]["stNo"]=="16nm722x").be.true
+    expect(sortedUsers[2]["stNo"]=="16nm701x").be.true
+    expect(sortedUsers[3]["stNo"]=="11t4054x").be.true
+
   it "ユーザ情報から任意のユーザを取得する", ->
     # TODO: 順番に依存しない形式への書き換え
     expect(user.getBy("name","tozawa",null)[1]==1).be.true
@@ -81,4 +93,30 @@ describe 'ユーザデータに対する操作',->
 
     # 存在しないユーザ
     expect(user.remove.bind(user,5,null)).to.throw(Error)
+
+  context '学籍番号クラスのテスト', ->
+    it '学籍番号の生成', ->
+      bachelor = new user.StudentNumber("11t4054x")
+      master   = new user.StudentNumber("15nm722x")
+      noStudent = new user.StudentNumber("aaa")
+      expect(bachelor.degree=="bachelor").be.true
+      expect(master.degree=="master").be.true
+      expect(noStudent.degree==null).be.true
+    it '学籍番号の比較', ->
+      bachelor1 = new user.StudentNumber("11t4054x")
+      bachelor2 = new user.StudentNumber("10t4054x")
+      bachelor3 = new user.StudentNumber("11t4001x")
+      expect(bachelor1.earlierThan(bachelor2)).be.true
+      expect(bachelor1.earlierThan(bachelor3)).be.false
+      expect(bachelor1.earlierThan(bachelor1)).be.false
+      master1 = new user.StudentNumber("15nm722x")
+      master2 = new user.StudentNumber("14nm722x")
+      master3 = new user.StudentNumber("15nm701x")
+      expect(master1.earlierThan(master2)).be.true
+      expect(master1.earlierThan(master3)).be.false
+      expect(master1.earlierThan(master1)).be.false
+
+      expect(master1.earlierThan(bachelor1)).be.false
+      expect(bachelor1.earlierThan(master1)).be.true
+
 
