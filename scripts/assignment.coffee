@@ -50,7 +50,7 @@ exports.swap = (id1, id2, robot) ->
 exports.getAssignmentsListMsg = (assignments) ->
   unless assignments?
     return [ "There are no assignments. Please assign users to duty by `assign users` command." ]
-  msg = ["Assignments list is following"]
+  msg = []
   for assignment in assignments
     id     = assignment["id"]
     date   = assignment["date"]

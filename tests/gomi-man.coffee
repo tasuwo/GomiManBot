@@ -36,8 +36,7 @@ describe 'ユーザコマンドのテスト', ->
           ['alice', 'hubot save bob as grade:M1']
           ['hubot', 'Save bob!']
           ['alice', 'hubot users list']
-          ['hubot', 'Registerd users are as follows...']
-          ['hubot', '`1` name:bob, grade:M1']
+          ['hubot', 'Registerd users are as follows...\n`1` name:bob, grade:M1']
         ]
 
     it '複数の情報を保存できる', ->
@@ -48,8 +47,7 @@ describe 'ユーザコマンドのテスト', ->
           ['alice', 'hubot save me as grade:B4, no:11t4054x']
           ['hubot', 'Save alice!']
           ['alice', 'hubot users list']
-          ['hubot', 'Registerd users are as follows...']
-          ['hubot', '`1` name:alice, grade:B4, no:11t4054x']
+          ['hubot', 'Registerd users are as follows...\n`1` name:alice, grade:B4, no:11t4054x']
         ]
 
     it 'ユーザ名が重複していた場合にはエラーを出力する', ->
@@ -99,9 +97,7 @@ describe 'ユーザコマンドのテスト', ->
           ['bob', 'hubot save me as grade:M1']
           ['hubot', 'Save bob!']
           ['alice', 'hubot users list']
-          ['hubot', 'Registerd users are as follows...']
-          ['hubot', '`1` name:alice, grade:B4']
-          ['hubot', '`2` name:bob, grade:M1']
+          ['hubot', 'Registerd users are as follows...\n`1` name:alice, grade:B4\n`2` name:bob, grade:M1']
         ]
 
     it 'ユーザが存在しない場合には，登録を促すメッセージを表示する', ->
@@ -129,9 +125,7 @@ describe 'ユーザコマンドのテスト', ->
           ['alice', 'hubot save me as grade:B4']
           ['hubot', 'Save alice!']
           ['alice', 'hubot users list']
-          ['hubot', 'Registerd users are as follows...']
-          ['hubot', '`1` name:bob, grade:M2']
-          ['hubot', '`2` name:alice, grade:B4']
+          ['hubot', 'Registerd users are as follows...\n`1` name:bob, grade:M2\n`2` name:alice, grade:B4']
         ]
 
   context '更新', ->
@@ -146,8 +140,7 @@ describe 'ユーザコマンドのテスト', ->
           ['alice', 'hubot users update 1 : name > bob']
           ['hubot', 'Successfully updated!']
           ['alice', 'hubot users list']
-          ['hubot', 'Registerd users are as follows...']
-          ['hubot', '`1` name:bob, grade:B4']
+          ['hubot', 'Registerd users are as follows...\n`1` name:bob, grade:B4']
         ]
 
     it '重複した名前に更新しようとした場合にはエラーを出力する', ->

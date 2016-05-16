@@ -75,8 +75,7 @@ module.exports = (robot) ->
         else ["Some members were assigned to duty as follows!"]
         Array.prototype.push.apply(messages, as.getAssignmentsListMsg(as.getAssignmentsList(robot)))
 
-        for message in messages
-          msg.send message
+        msg.send messages.join("\n")
 
         cron.startAssignCronJobs(robot, as.getAssignmentsList(robot))
       )
@@ -86,8 +85,7 @@ module.exports = (robot) ->
   regex = "assign list$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
     messages = as.getAssignmentsListMsg(as.getAssignmentsList(robot))
-    for message in messages
-      msg.send message
+    msg.send messages.join("\n")
 
   regex = "assign swap [0-9]+ [0-9]+"
   robot.respond "/"+regex+"/", (msg) ->
@@ -120,18 +118,18 @@ module.exports = (robot) ->
   robot.respond "/"+regex+"/", (msg) ->
     users = user.getAll(robot)
     unless users?
-      msg.send "There are no users. Please regist users by `save
-  (me|<name>) as <prop>:<val>, ...`"
+      msg.send "There are no users. Please regist users by `save (me|<name>) as <prop>:<val>, ...`"
       return
-    msg.send "Registerd users are as follows..."
+    messages = ["Registerd users are as follows..."]
     users.forEach((user) ->
       list_str = "`#{user["id"]}`"
       for key, value of user
         if key=="id" then continue
         list_str = list_str + " #{key}:#{user[key]},"
       list_str = list_str.substr(0, list_str.length-1)
-      msg.send list_str
+      messages.push list_str
     )
+    msg.send messages.join("\n")
 
   regex = "users sort by (.+)$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
