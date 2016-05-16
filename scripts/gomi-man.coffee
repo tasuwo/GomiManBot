@@ -122,18 +122,19 @@ module.exports = (robot) ->
       msg.send list_str
     )
 
-  regex = "users sort by (grade)$"; regexes.push regex
+  regex = "users sort by (.+)$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
     sortMethod = msg.match[0].replace(/\s+/g, " ").split(" ")[4]
     users = user.getAll(robot)
     unless users?
-      msg.send "There are no users. Please regist users by `save
-  (me|<name>) as <prop>:<val>, ...`"
+      msg.send "There are no users. Please regist users by `save (me|<name>) as <prop>:<val>, ...`"
     switch sortMethod
       when "grade"
         users = user.sortUsersByGrade(users)
+      else
+        msg.send "There are no method for sort"; return
     user.save(users, robot)
-    msg.send "Users were sorted by grade!"
+    msg.send "Users were sorted by #{sortMethod}!"
 
   regex = "users swap [0-9]+ [0-9]+$"
   robot.respond "/"+regex+"/", (msg) ->

@@ -279,8 +279,35 @@ describe 'ユーザコマンドのテスト', ->
         ]
       user.getAll.restore()
 
-  context 'チャンネル設定', ->
+  context 'ユーザ操作', ->
+    getAllStub = null
+
     beforeEach ->
+      usersData = [
+        {"id":1, "name":"tasuwo", "grade":"M1"},
+        {"id":2, "name":"tozawa", "grade":"M2"},
+        {"id":3, "name":"tetsuwo", "grade":"B4"},
+        {"id":4, "name":"aaa", "grade":"M1"},
+      ]
+      getAllStub = sinon.stub(user, 'getAll')
+      getAllStub.returns(usersData)
+
+    afterEach ->
+      user.getAll.restore()
+
+    it 'ユーザをソートする', (done)->
+      co =>
+        yield room.user.say 'alice', 'hubot users sort by ???'
+        yield room.user.say 'alice', 'hubot users sort by grade'
+        yield done()
+        expect(room.messages).to.eql [
+          ['alice', 'hubot users sort by ???']
+          ['hubot', 'There are no method for sort']
+          ['alice', 'hubot users sort by grade']
+          ['hubot', 'Users were sorted by grade!']
+        ]
+
+  context 'チャンネル設定', ->
     it '通知用チャンネルを保存する', ->
       co =>
         yield room.user.say 'alice', 'hubot channel check'
