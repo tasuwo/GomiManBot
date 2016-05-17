@@ -27,29 +27,30 @@
 api = require("./googleapi.coffee")
 user = require("./user.coffee")
 async = require("async")
-cron = require("./cron.coffee")
+{ CronSettingConverter, NotificationChannel, CronJobManager } = require("./cron.coffee")
 as = require("./assignment.coffee")
 logger = require("./logger.coffee")
 
 module.exports = (robot) ->
   regexes = []
-  cron.startJobs(robot)
+  notificationChannel = new NotificationChannel(robot)
+  cronJobManager = new CronJobManager(robot)
+  cronJobManager.startMonthlyJobTo(notificationChannel.get())
 
   # TODO : set automatically when bot is invited
   regex = "channel set (.+)$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
     channel = msg.match[0].replace(/\s+/g, " ").split(" ")[3]
-    cron.setNotifyChannel(channel, robot)
-    msg.send "I'll send notification to channel: ##{channel}!"
+    notificationChannel.set(channel)
+    msg.send "I'll send notification to channel: ##{channel} !"
 
   regex = "channel check$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
-    channel = cron.getNotifyChannel(robot)
+    channel = notificationChannel.get()
     unless channel?
-      msg.send "No channel registered. Please save channel by `channel
-  set <channel name>` command."
+      msg.send "No channel registered. Please save channel by `channel set <channel name>` command."
       return
-    msg.send "Notify channel is set to ##{channel}"
+    msg.send "Notify channel is set to ##{channel} "
 
   regex = "auth get url$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
@@ -78,7 +79,7 @@ module.exports = (robot) ->
 
         msg.send messages.join("\n")
 
-        cron.startAssignCronJobs(robot, as.getAssignmentsList(robot))
+        cronJobManager.startJobsBasedOn(as.getAssignmentsList(robot), notificationChannel.get())
       )
     catch error
       msg.send error
@@ -94,7 +95,7 @@ module.exports = (robot) ->
     id2 = parseInt(msg.match[0].replace(/\s+/g, " ").split(" ")[4])
     try
       as.swap(id1, id2, robot)
-      cron.startAssignCronJobs(robot, as.getAssignmentsList(robot))
+      cronJobManager.startJobsBasedOn(as.getAssignmentsList(robot), notificationChannel.get())
       msg.send "Successfully swapped!"
     catch error
       msg.send error
@@ -209,7 +210,7 @@ module.exports = (robot) ->
     reader = null
     switch log_kind
       when "cron"
-        log_fname = cron.LOG_FNAME
+        log_fname = cronJobManager.LOG_FNAME
         reader = logger.getReader('debug', log_fname)
       else
         msg.send "There are no log for #{log_kind}"; return

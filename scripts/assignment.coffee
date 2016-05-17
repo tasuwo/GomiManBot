@@ -1,7 +1,6 @@
 api = require("./googleapi.coffee")
 user = require("./user.coffee")
 async = require("async")
-cron = require("./cron.coffee")
 
 ASSIGNMENTS_KEY = 'assignments_key'
 LAST_ASSIGNED_MONTH = 'last_assigned_month'
