@@ -8,18 +8,22 @@ readline  = require('readline')
 exports.getLogDirPath = () ->
   return LOG_DIR_PATH
 
-exports.getWriter = (level, fName) ->
+preparation = (fName) ->
   try
     fs.mkdirSync LOG_DIR_PATH
   catch err
     if err.code != 'EEXIST' then throw err
   try
-    fs.writeFile LOG_DIR_PATH+'/'+fName, ""
+    fs.closeSync(fs.openSync LOG_DIR_PATH+'/'+fName, 'w')
   catch err
-    if err.code != 'EEXIST' then throw err
+    throw err
+
+exports.getWriter = (level, fName) ->
+  preparation fName
   stream = fs.createWriteStream LOG_DIR_PATH + '/' + fName
   return new Log(level, stream)
 
 exports.getReader = (level, fName) ->
+  preparation fName
   stream = fs.createReadStream LOG_DIR_PATH + '/' + fName
   return new Log(level, stream)
