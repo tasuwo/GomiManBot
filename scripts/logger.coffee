@@ -1,29 +1,37 @@
-HOME_PATH = (process.env.HOME or process.env.HOMEPATH or process.env.USERPROFILE)
-LOG_DIR_PATH = HOME_PATH + '/.gomi-man-bot-log'
+Log = require('log')
+fs = require('fs')
 
-Log       = require('log')
-fs        = require('fs')
-readline  = require('readline')
+class Logger
+  @HOME_PATH: (process.env.HOME or process.env.HOMEPATH or process.env.USERPROFILE)
+  @LOG_DIR_PATH: @HOME_PATH + '/.gomi-man-bot-log'
 
-exports.getLogDirPath = () ->
-  return LOG_DIR_PATH
+  constructor: (fName) ->
+    @fName = fName
 
-preparation = (fName) ->
-  try
-    fs.mkdirSync LOG_DIR_PATH
-  catch err
-    if err.code != 'EEXIST' then throw err
-  try
-    fs.closeSync(fs.openSync LOG_DIR_PATH+'/'+fName, 'w')
-  catch err
-    throw err
+  @getLogDirPath: () ->
+    @LOG_DIR_PATH
 
-exports.getWriter = (level, fName) ->
-  preparation fName
-  stream = fs.createWriteStream LOG_DIR_PATH + '/' + fName
-  return new Log(level, stream)
+  _getLogFilePath: () ->
+    return Logger.LOG_DIR_PATH + '/' + @fName
 
-exports.getReader = (level, fName) ->
-  preparation fName
-  stream = fs.createReadStream LOG_DIR_PATH + '/' + fName
-  return new Log(level, stream)
+  _preparation: () ->
+    try
+      fs.mkdirSync Logger.LOG_DIR_PATH
+    catch err
+      if err.code != 'EEXIST' then throw err
+    try
+      fs.closeSync(fs.openSync this._getLogFilePath(), 'w')
+    catch err
+      throw err
+
+  getWriter: () ->
+    this._preparation()
+    stream = fs.createWriteStream this._getLogFilePath()
+    return new Log("debug", stream)
+
+  getReader: () ->
+    this._preparation()
+    stream = fs.createReadStream this._getLogFilePath()
+    return new Log("debug", stream)
+
+module.exports = Logger

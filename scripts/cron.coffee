@@ -1,9 +1,10 @@
 as = require('./assignment.coffee')
 cronJob = require('cron').CronJob
-logger = require('./logger.coffee')
+Logger = require('./logger.coffee')
 LOG_FNAME = 'cron.log'
 exports.LOG_FNAME = LOG_FNAME
-writer = logger.getWriter('debug', LOG_FNAME)
+logger = new Logger(LOG_FNAME)
+writer = logger.getWriter()
 
 assignCronJobs = []
 NOTIFY_CHANNEL = "norify channel"

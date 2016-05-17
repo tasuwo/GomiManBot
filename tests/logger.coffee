@@ -3,18 +3,19 @@ expect = chai.expect
 chai.should()
 sinon = require 'sinon'
 
-logger = require('./../scripts/logger.coffee')
+Logger = require('./../scripts/logger.coffee')
 fs = require('fs')
 
 describe 'ログのテスト', ->
   FNAME = 'tmp.log'
-  DIR_PATH = logger.getLogDirPath()
+  DIR_PATH = Logger.getLogDirPath()
+  logger = new Logger(FNAME)
 
   after ->
     fs.unlink DIR_PATH+'/'+FNAME
 
   it "ログ保存&読み取りテスト", (done)->
-    writer = logger.getWriter('debug', FNAME)
+    writer = logger.getWriter()
 
     obj = new Object()
     obj.invoked = () ->
@@ -24,7 +25,7 @@ describe 'ログのテスト', ->
     writer.error('some error messages')
     writer.error('some error messages')
 
-    reader = logger.getReader('debug', FNAME)
+    reader = logger.getReader()
     reader
       .on 'line', (line) ->
         obj.invoked()
