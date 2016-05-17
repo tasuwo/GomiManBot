@@ -29,6 +29,7 @@ user = require("./user.coffee")
 async = require("async")
 cron = require("./cron.coffee")
 as = require("./assignment.coffee")
+logger = require("./logger.coffee")
 
 module.exports = (robot) ->
   regexes = []
@@ -201,6 +202,21 @@ module.exports = (robot) ->
       msg.send "Successfully removed!"
     catch error
       msg.send "#{error}"
+
+  regex = "debug logs (.+)$"
+  robot.respond "/"+regex+"/", (msg) ->
+    log_kind = msg.match[0].replace(/\s+/g, " ").split(" ")[3]
+    reader = null
+    switch log_kind
+      when "cron"
+        log_fname = cron.LOG_FNAME
+        reader = logger.getReader('debug', log_fname)
+      else
+        msg.send "There are no log for #{log_kind}"; return
+    reader
+      .on 'line', (line) ->
+        msg.send line.toString()
+        console.log(line)
 
   # TODO: Intelligence match
   robot.hear new RegExp("^@gomi-man-bot: (?!("+regexes.join("|")+"))", "g"), (msg) ->

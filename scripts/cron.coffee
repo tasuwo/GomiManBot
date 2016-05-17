@@ -1,5 +1,9 @@
 as = require('./assignment.coffee')
 cronJob = require('cron').CronJob
+logger = require('./logger.coffee')
+LOG_FNAME = 'cron.log'
+exports.LOG_FNAME = LOG_FNAME
+writer = logger.getWriter('debug', LOG_FNAME)
 
 assignCronJobs = []
 NOTIFY_CHANNEL = "norify channel"
@@ -84,5 +88,6 @@ exports.startAssignCronJobs = (robot, assignments) ->
         this.sendMessage(robot, envelope, "@"+assignment["assign"]+" You are assigned to duty in tommorow")
       )
     )
+    writer.info('Save cron job! date:%s, to:%s', notifiedDate, assignment["assign"])
   for job in assignCronJobs
     job.start()
