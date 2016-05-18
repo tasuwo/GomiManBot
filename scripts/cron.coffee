@@ -38,10 +38,10 @@ class NotificationChannel
 
 class CronJobManager
   @LOG_FNAME: "cron.log"
+  @LOGS: []
 
   constructor: (robot) ->
     @monthlyJob = null
-    @assignedCronJobs = []
     @robot = robot
     @assignment = new Assignment(robot)
     @logger = (new Logger CronJobManager.LOG_FNAME).getWriter()
@@ -50,17 +50,17 @@ class CronJobManager
     @robot.send envelope, msg
 
   resetAssignedCronJobs: () ->
-    if @assignedCronJobs.length >0
-      for job in @assignedCronJobs
+    if CronJobManager.LOGS.length >0
+      for job in CronJobManager.LOGS
         job.stop()
-      @assignedCronJobs = []
+      CronJobManager.LOGS = []
 
   getAssignedCronJobs: () ->
-    if @assignedCronJobs == []
+    if CronJobManager.JOBS == []
       return ["There are no cron jobs"]
     else
       msg = []
-      for job in assignCronJobs
+      for job in CronJobManager.JOBS
         msg.push job
 
   startMonthlyJobTo: (channel) ->
@@ -88,7 +88,7 @@ class CronJobManager
     for assignment in assignments
       assignedDate = CronSettingConverter.convertDateToCronSetting(assignment["date"])
       notifiedDate = CronSettingConverter.convertCronSettingToDayBefore(assignedDate)
-      @assignedCronJobs.push(
+      CronJobManager.LOGS.push(
         new CronJob(notifiedDate, () =>
           envelope = room: (channel or "general")
           this._sendMessage envelope, "@"+assignment["assign"]+" You are assigned to duty in tommorow"
@@ -96,7 +96,7 @@ class CronJobManager
       )
       @logger.info("Save assignments cron job : date:%s, user:%s", notifiedDate, assignment["assign"])
 
-    for job in @assignedCronJobs
+    for job in CronJobManager.LOGS
       job.start()
 
 module.exports = {
