@@ -30,7 +30,7 @@ async = require("async")
 NotificationChannel = require("./cron.coffee").NotificationChannel
 CronJobManager = require("./cron.coffee").CronJobManager
 Assignment = require './assignment'
-logger = require './logger'
+Logger = require './logger'
 
 module.exports = (robot) ->
   regexes = []
@@ -214,13 +214,15 @@ module.exports = (robot) ->
     switch log_kind
       when "cron"
         log_fname = cronJobManager.LOG_FNAME
-        reader = logger.getReader('debug', log_fname)
+        reader = (new Logger log_fname).getReader()
       else
         msg.send "There are no log for #{log_kind}"; return
     reader
       .on 'line', (line) ->
         msg.send line.toString()
         console.log(line)
+      .on 'end', () ->
+        msg.send 'done.'
 
   # TODO: Intelligence match
   robot.hear new RegExp("^@gomi-man-bot: (?!("+regexes.join("|")+"))", "g"), (msg) ->

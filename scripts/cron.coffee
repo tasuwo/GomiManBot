@@ -44,6 +44,7 @@ class CronJobManager
     @assignedCronJobs = []
     @robot = robot
     @assignment = new Assignment(robot)
+    @logger = (new Logger CronJobManager.LOG_FNAME).getWriter()
 
   _sendMessage: (envelope, msg) ->
     @robot.send envelope, msg
@@ -75,6 +76,7 @@ class CronJobManager
           this._sendMessage envelope, message
       )
     )
+    @logger.info("Save monthly cron job")
 
     @monthlyJob.start()
 
@@ -92,6 +94,7 @@ class CronJobManager
           this._sendMessage envelope, "@"+assignment["assign"]+" You are assigned to duty in tommorow"
         )
       )
+      @logger.info("Save assignments cron job : date:%s, user:%s", notifiedDate, assignment["assign"])
 
     for job in @assignedCronJobs
       job.start()
