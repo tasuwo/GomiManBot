@@ -1,6 +1,6 @@
 Helper = require('hubot-test-helper')
 helper = new Helper('./../scripts/gomi-man.coffee')
-user   = require('./../scripts/user.coffee')
+User = require('./../scripts/user.coffee').User
 Assignment = require('./../scripts/assignment.coffee')
 
 expect = require('chai').expect
@@ -9,11 +9,9 @@ sinon  = require('sinon')
 
 describe 'ユーザコマンドのテスト', ->
   room = null
-  assignment = null
 
   beforeEach ->
     room = helper.createRoom()
-    assignment = new Assignment(null)
 
   afterEach ->
     room.destroy()
@@ -170,8 +168,7 @@ describe 'ユーザコマンドのテスト', ->
     #   ]
 
   context '削除', ->
-    it 'ユーザを削除する(すべてのユーザが削除されると，usersがnullにな
-      る)', ->
+    it 'ユーザを削除する(すべてのユーザが削除されると，usersがnullになる)', ->
       co =>
         yield room.user.say 'alice', 'hubot save me as grade:B4'
         yield room.user.say 'alice', 'hubot users remove 1'
@@ -196,15 +193,20 @@ describe 'ユーザコマンドのテスト', ->
   context '交換', ->
     getAllStub = null
 
-    it 'ユーザの順番を交換する', ->
+    before ->
       usersData = [
         {"id":1, "name":"tasuwo", "grade":"M1"},
         {"id":2, "name":"tozawa", "grade":"M2"},
         {"id":3, "name":"tetsuwo", "grade":"B4"},
         {"id":4, "name":"aaa", "grade":"M1"},
       ]
-      getAllStub = sinon.stub(user, 'getAll')
+      getAllStub = sinon.stub(User.prototype, 'getAll')
       getAllStub.returns(usersData)
+
+    after ->
+      User.prototype.getAll.restore()
+
+    it 'ユーザの順番を交換する', ->
       co =>
         yield room.user.say 'alice', 'hubot users swap 2 4'
         yield room.user.say 'alice', 'hubot users list'
@@ -213,19 +215,34 @@ describe 'ユーザコマンドのテスト', ->
           ['alice', 'hubot users swap 2 4']
           ['hubot', 'Swapped user 2 and 4!']
           ['alice', 'hubot users list']
-          ['hubot', 'Registerd users are as follows...']
-          ['hubot', '`1` name:tasuwo, grade:M1']
-          ['hubot', '`2` name:aaa, grade:M1']
-          ['hubot', '`3` name:tetsuwo, grade:B4']
-          ['hubot', '`4` name:tozawa, grade:M2']
+          ['hubot', 'Registerd users are as follows...\n`1` name:tasuwo, grade:M1\n`2` name:aaa, grade:M1\n`3` name:tetsuwo, grade:B4\n`4` name:tozawa, grade:M2']
           ['alice', 'hubot users swap 0 10']
           ['hubot', 'Error: Specified user id doesn\'t exist']
         ].toString()
-      user.getAll.restore()
 
   context 'ユーザ割り当て', ->
     getAssignmentsListStub = null
     getAllStub = null
+
+    before ->
+      assignmentsList = [
+        {"id":1, "date":"2016-10-3", "duty":"ゴミ捨て", "assign":"tozawa"},
+        {"id":2, "date":"2016-10-20", "duty":"ゴミ捨て", "assign":"tasuku"}
+      ]
+      getAssignmentsListStub = sinon.stub(Assignment.prototype, 'getList')
+      getAssignmentsListStub.returns(assignmentsList)
+      usersData = [
+        {"id":1, "name":"tasuwo", "grade":"M1"},
+        {"id":2, "name":"tozawa", "grade":"M2"},
+        {"id":3, "name":"tetsuwo", "grade":"B4"},
+        {"id":4, "name":"aaa", "grade":"M1"},
+      ]
+      getAllStub = sinon.stub(User.prototype, 'getAll')
+      getAllStub.returns(usersData)
+
+    after ->
+      Assignment.prototype.getList.restore()
+      User.prototype.getAll.restore()
 
     it 'ユーザ割り当てが行われていない場合はその旨を通知する', (done)->
       co =>
@@ -237,31 +254,14 @@ describe 'ユーザコマンドのテスト', ->
         ]
 
     it 'ユーザの割り当て表を表示する', ->
-      assignmentsList = [
-        {"id":1, "date":"2016-10-3", "duty":"ゴミ捨て", "assign":"tozawa"},
-        {"id":2, "date":"2016-10-20", "duty":"ゴミ捨て", "assign":"tasuku"}
-      ]
-      getAssignmentsListStub = sinon.stub(assignment, 'getList')
-      getAssignmentsListStub.returns(assignmentsList)
       co =>
         yield room.user.say 'alice', 'hubot assign list'
         expect(room.messages).to.eql [
           ['alice', 'hubot assign list']
-          ['hubot', 'Assignments list is following']
-          ['hubot', '`1` date:2016-10-3, duty:ゴミ捨て, member:tozawa']
-          ['hubot', '`2` date:2016-10-20, duty:ゴミ捨て, member:tasuku']
+          ['hubot', '`1` date:2016-10-3, duty:ゴミ捨て, member:tozawa\n`2` date:2016-10-20, duty:ゴミ捨て, member:tasuku']
         ]
-      assignment.getList.restore()
 
     it 'ユーザ割り当てを途中から開始する', (done)->
-      usersData = [
-        {"id":1, "name":"tasuwo", "grade":"M1"},
-        {"id":2, "name":"tozawa", "grade":"M2"},
-        {"id":3, "name":"tetsuwo", "grade":"B4"},
-        {"id":4, "name":"aaa", "grade":"M1"},
-      ]
-      getAllStub = sinon.stub(user, 'getAll')
-      getAllStub.returns(usersData)
       co =>
         yield room.user.say 'alice', 'hubot assign from 2'
         yield room.user.say 'alice', 'hubot assign from 5'
@@ -272,7 +272,6 @@ describe 'ユーザコマンドのテスト', ->
           ['alice', 'hubot assign from 5'],
           ['hubot', 'Error: There are no specified user']
         ]
-      user.getAll.restore()
 
   context 'ユーザ操作', ->
     getAllStub = null
@@ -284,11 +283,11 @@ describe 'ユーザコマンドのテスト', ->
         {"id":3, "name":"tetsuwo", "grade":"B4", "stNo":"11t4054x"},
         {"id":4, "name":"aaa", "grade":"M1", "stNo":"16nm701x"},
       ]
-      getAllStub = sinon.stub(user, 'getAll')
+      getAllStub = sinon.stub(User.prototype, 'getAll')
       getAllStub.returns(usersData)
 
     afterEach ->
-      user.getAll.restore()
+      User.prototype.getAll.restore()
 
     it 'ユーザをソートする', (done)->
       co =>

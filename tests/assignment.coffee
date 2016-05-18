@@ -5,7 +5,6 @@ sinon = require 'sinon'
 
 Assignment = require('./../scripts/assignment.coffee')
 api = require('./../scripts/googleapi.coffee')
-users = require('./../scripts/user.coffee')
 
 describe '当番の割り当てに関するテスト',->
   usersData = null
@@ -40,7 +39,7 @@ describe '当番の割り当てに関するテスト',->
       getEventsStub = sinon.stub(api, 'getEvents')
       getLastAssignedMonthStub = sinon.stub(assignment, 'getLastMonth')
       getLastAssignedUserStub  = sinon.stub(assignment, 'getLastUser')
-      getAllStub = sinon.stub(users, 'getAll')
+      getAllStub = sinon.stub(assignment.user, 'getAll')
       saveAssignmentStub = sinon.stub(assignment, 'save')
 
     after ->
@@ -48,7 +47,7 @@ describe '当番の割り当てに関するテスト',->
       api.getEvents.restore()
       assignment.getLastMonth.restore()
       assignment.getLastUser.restore()
-      users.getAll.restore()
+      assignment.user.getAll.restore()
       assignment.save.restore()
 
     it '正常に割り当てが行える', (done) ->

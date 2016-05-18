@@ -1,5 +1,5 @@
 api = require("./googleapi.coffee")
-user = require("./user.coffee")
+User = require("./user.coffee").User
 async = require("async")
 
 class Assignment
@@ -9,6 +9,7 @@ class Assignment
 
   constructor: (robot) ->
     @robot = robot
+    @user = new User(robot)
 
   save: (assignments, dates) ->
     unless assignments?
@@ -39,7 +40,7 @@ class Assignment
     @robot.brain.get Assignment.USERS_KEY
 
   setLastUserBy: (id) ->
-    unless user.getBy("id", id, robot)?
+    unless @user.getBy("id", id)?
       throw Error "There are no specified user"
     @robot.brain.set(Assignment.USERS_KEY, id)
 
@@ -92,7 +93,7 @@ class Assignment
       if parseInt(Object.keys(dates)[0].split("-")[1]) == (this.getLastMonth() or "")
         next null, true; return
 
-      users = user.getAll(@robot)
+      users = @user.getAll()
       unless users?
         next "There are no users for assignment"
         return

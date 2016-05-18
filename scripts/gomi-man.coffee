@@ -25,7 +25,7 @@
 #   tasuwo <kamuhata.you@gmail.com>
 
 api = require("./googleapi.coffee")
-user = require("./user.coffee")
+User = require("./user.coffee").User
 async = require("async")
 NotificationChannel = require("./cron.coffee").NotificationChannel
 CronJobManager = require("./cron.coffee").CronJobManager
@@ -37,6 +37,7 @@ module.exports = (robot) ->
   notificationChannel = new NotificationChannel robot
   cronJobManager = new CronJobManager robot
   assignment = new Assignment robot
+  user = new User robot
   cronJobManager.startMonthlyJobTo(notificationChannel.get())
 
   # TODO : set automatically when bot is invited
@@ -112,7 +113,7 @@ module.exports = (robot) ->
     id = parseInt(msg.match[0].replace(/\s+/g, " ").split(" ")[3])
     try
       assignment.setLastUserBy(id)
-      u = user.getBy("id", id, robot)
+      u = user.getBy("id", id)
       unless u? then throw Error "There are no specified user"
       msg.send "Assign from `#{id}` #{u[0]["name"]} in next assignment!"
     catch error
@@ -120,7 +121,7 @@ module.exports = (robot) ->
 
   regex = "users list$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
-    users = user.getAll(robot)
+    users = user.getAll()
     unless users?
       msg.send "There are no users. Please regist users by `save (me|<name>) as <prop>:<val>, ...`"
       return
@@ -138,19 +139,19 @@ module.exports = (robot) ->
   regex = "users sort by (.+)$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
     sortMethod = msg.match[0].replace(/\s+/g, " ").split(" ")[4]
-    users = user.getAll(robot)
+    users = user.getAll()
     unless users?
       msg.send "There are no users. Please regist users by `save (me|<name>) as <prop>:<val>, ...`"
     switch sortMethod
       when "grade"
-        users = user.sortUsersByGrade(users)
+        users = user.sortByGrade(users)
       when "stNo"
-        users = user.sortUsersByStNo(users)
+        users = user.sortByStNo(users)
       when "reverse"
         users = users.reverse()
       else
         msg.send "There are no method for sort"; return
-    user.save(users, robot)
+    user.save(users)
     msg.send "Users were sorted by #{sortMethod}!"
 
   regex = "users swap [0-9]+ [0-9]+$"
@@ -158,7 +159,7 @@ module.exports = (robot) ->
     id1 = parseInt(msg.match[0].replace(/\s+/g, " ").split(" ")[3])
     id2 = parseInt(msg.match[0].replace(/\s+/g, " ").split(" ")[4])
     try
-      user.swap(id1,id2,robot)
+      user.swap(id1,id2)
       msg.send "Swapped user #{id1} and #{id2}!"
     catch error
       msg.send "#{error}"
@@ -181,7 +182,7 @@ module.exports = (robot) ->
         return
       props[prop_str[0]] = prop_str[1]
     try
-      user.set(props, robot)
+      user.set(props)
       msg.send "Save #{saved_name}!"
     catch error
       msg.send "#{error}"
@@ -192,7 +193,7 @@ module.exports = (robot) ->
     prop = msg.match[0].replace(/\s+/g, " ").split(" ")[5]
     val  = msg.match[0].replace(/\s+/g, " ").split(" ")[7]
     try
-      user.update(id, prop, val, robot)
+      user.update(id, prop, val)
       msg.send "Successfully updated!"
     catch error
       msg.send "#{error}"
@@ -201,7 +202,7 @@ module.exports = (robot) ->
   robot.respond "/"+regex+"/", (msg) ->
     id = parseInt(msg.match[0].replace(/\s+/g, " ").split(" ")[3])
     try
-      user.remove(id, robot)
+      user.remove(id)
       msg.send "Successfully removed!"
     catch error
       msg.send "#{error}"
