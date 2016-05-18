@@ -56,6 +56,7 @@ class Assignment
     assignments[id1-1]["assign"] = assignments[id2-1]["assign"]
     assignments[id2-1]["assign"] = tmp
     this.setList(assignments)
+    assignments
 
   generateStringForm: (assignments) ->
     unless assignments?

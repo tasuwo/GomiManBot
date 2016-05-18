@@ -97,8 +97,8 @@ module.exports = (robot) ->
     id1 = parseInt(msg.match[0].replace(/\s+/g, " ").split(" ")[3])
     id2 = parseInt(msg.match[0].replace(/\s+/g, " ").split(" ")[4])
     try
-      assignment.swap(id1, id2)
-      cronJobManager.startJobsBasedOn(assignment.getList(), notificationChannel.get())
+      assignments = assignment.swap(id1, id2)
+      cronJobManager.startJobsBasedOn(assignments, notificationChannel.get())
       msg.send "Successfully swapped!"
     catch error
       msg.send error
