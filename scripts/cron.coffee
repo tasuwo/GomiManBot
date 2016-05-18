@@ -1,4 +1,4 @@
-as = require('./assignment.coffee')
+Assignment = require('./assignment')
 CronJob = require('cron').CronJob
 Logger = require('./logger.coffee')
 
@@ -43,6 +43,7 @@ class CronJobManager
     @monthlyJob = null
     @assignedCronJobs = []
     @robot = robot
+    @assignment = new Assignment(robot)
 
   _sendMessage: (envelope, msg) ->
     @robot.send envelope, msg
@@ -65,7 +66,7 @@ class CronJobManager
     @monthlyJob = new CronJob('0 0 12 1 */1 *', () =>
       envelope = room: (channel or "general")
       messages = [ "@channel Check!" ]
-      as.assign(@robot, (resultMsgs, err) ->
+      @assignment.assign(@robot, (resultMsgs, err) ->
         if err
           this._sendMessage envelope, "Error: " + err + ", so cannnot extcute cron job"
         for resultMsg in resultMsgs

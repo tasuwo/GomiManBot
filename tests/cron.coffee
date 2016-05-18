@@ -5,7 +5,7 @@ chai.should()
 
 Converter = require('./../scripts/cron.coffee').CronSettingConverter
 CronJobManager = require('./../scripts/cron.coffee').CronJobManager
-as = require('./../scripts/assignment.coffee')
+Assignment = require('./../scripts/assignment.coffee')
 
 describe 'Cronに関するテスト', ->
   context "Cron設定の変換に関するテスト", ->
@@ -38,15 +38,15 @@ describe 'Cronに関するテスト', ->
         clock.restore()
 
     it "毎月一日に通知を行う", ->
-      asMock = sinon.mock(as)
+      assignmentMock = sinon.mock(manager.assignment)
       clock = sinon.useFakeTimers(new Date(2016, 10, 1, 11, 59).getTime())
-      asMock.expects("assign").once()
+      assignmentMock.expects("assign").once()
 
       manager.startMonthlyJobTo(null)
       clock.tick(60 * 1000)
 
-      asMock.verify()
-      asMock.restore()
+      assignmentMock.verify()
+      assignmentMock.restore()
 
     it "当番の前日にユーザに向けて通知を行う", ->
       cronMock = sinon.mock(manager)

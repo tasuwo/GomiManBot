@@ -27,14 +27,16 @@
 api = require("./googleapi.coffee")
 user = require("./user.coffee")
 async = require("async")
-{ CronSettingConverter, NotificationChannel, CronJobManager } = require("./cron.coffee")
-as = require("./assignment.coffee")
-logger = require("./logger.coffee")
+NotificationChannel = require("./cron.coffee").NotificationChannel
+CronJobManager = require("./cron.coffee").CronJobManager
+Assignment = require './assignment'
+logger = require './logger'
 
 module.exports = (robot) ->
   regexes = []
-  notificationChannel = new NotificationChannel(robot)
-  cronJobManager = new CronJobManager(robot)
+  notificationChannel = new NotificationChannel robot
+  cronJobManager = new CronJobManager robot
+  assignment = new Assignment robot
   cronJobManager.startMonthlyJobTo(notificationChannel.get())
 
   # TODO : set automatically when bot is invited
@@ -68,25 +70,25 @@ module.exports = (robot) ->
   regex = "assign users$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
     try
-      as.assign(robot, (err, preStoredFlg) ->
+      assignment.assign(robot, (err, preStoredFlg) ->
         if err
           msg.send err
           return
         messages = if preStoredFlg
         then ["Assignment of this month has perfomed as follows"]
         else ["Some members were assigned to duty as follows!"]
-        Array.prototype.push.apply(messages, as.getAssignmentsListMsg(as.getAssignmentsList(robot)))
+        Array.prototype.push.apply(messages, assignment.getStringOf(assignment.getList()))
 
         msg.send messages.join("\n")
 
-        cronJobManager.startJobsBasedOn(as.getAssignmentsList(robot), notificationChannel.get())
+        cronJobManager.startJobsBasedOn(assignment.getList(), notificationChannel.get())
       )
     catch error
       msg.send error
 
   regex = "assign list$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
-    messages = as.getAssignmentsListMsg(as.getAssignmentsList(robot))
+    messages = assignment.generateStringFrom(assignment.getList())
     msg.send messages.join("\n")
 
   regex = "assign swap [0-9]+ [0-9]+"
@@ -94,22 +96,22 @@ module.exports = (robot) ->
     id1 = parseInt(msg.match[0].replace(/\s+/g, " ").split(" ")[3])
     id2 = parseInt(msg.match[0].replace(/\s+/g, " ").split(" ")[4])
     try
-      as.swap(id1, id2, robot)
-      cronJobManager.startJobsBasedOn(as.getAssignmentsList(robot), notificationChannel.get())
+      assignment.swap(id1, id2)
+      cronJobManager.startJobsBasedOn(assignment.getList(robot), notificationChannel.get())
       msg.send "Successfully swapped!"
     catch error
       msg.send error
 
   regex = "assign reset$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
-    as.resetAssignmentsList robot
+    assignment.reset()
     msg.send "Successfully reset assignment!"
 
   regex = "assign from [0-9]+$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
     id = parseInt(msg.match[0].replace(/\s+/g, " ").split(" ")[3])
     try
-      as.setLastAssignedUser(id, robot)
+      assignment.setLastUserBy(id)
       u = user.getBy("id", id, robot)
       unless u? then throw Error "There are no specified user"
       msg.send "Assign from `#{id}` #{u[0]["name"]} in next assignment!"

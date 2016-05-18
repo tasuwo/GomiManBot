@@ -3,15 +3,18 @@ expect = chai.expect
 chai.should()
 sinon = require 'sinon'
 
-assignment = require('./../scripts/assignment.coffee')
+Assignment = require('./../scripts/assignment.coffee')
 api = require('./../scripts/googleapi.coffee')
 users = require('./../scripts/user.coffee')
 
 describe '当番の割り当てに関するテスト',->
   usersData = null
   datesData = null
+  assignment = null
 
   before ->
+    assignment = new Assignment(null)
+
     usersData = [
       {"id":1, "name":"tasuwo", "grade":"M1"},
       {"id":2, "name":"tozawa", "grade":"M2"},
@@ -35,18 +38,18 @@ describe '当番の割り当てに関するテスト',->
     before ->
       authorizeStub = sinon.stub(api, 'authorize')
       getEventsStub = sinon.stub(api, 'getEvents')
-      getLastAssignedMonthStub = sinon.stub(assignment, 'getLastAssignedMonth')
-      getLastAssignedUserStub  = sinon.stub(assignment, 'getLastAssignedUser')
+      getLastAssignedMonthStub = sinon.stub(assignment, 'getLastMonth')
+      getLastAssignedUserStub  = sinon.stub(assignment, 'getLastUser')
       getAllStub = sinon.stub(users, 'getAll')
-      saveAssignmentStub = sinon.stub(assignment, 'saveAssignments')
+      saveAssignmentStub = sinon.stub(assignment, 'save')
 
     after ->
       api.authorize.restore()
       api.getEvents.restore()
-      assignment.getLastAssignedMonth.restore()
-      assignment.getLastAssignedUser.restore()
+      assignment.getLastMonth.restore()
+      assignment.getLastUser.restore()
       users.getAll.restore()
-      assignment.saveAssignments.restore()
+      assignment.save.restore()
 
     it '正常に割り当てが行える', (done) ->
       authorizeStub.callsArgWith(1, true, null)
@@ -55,7 +58,7 @@ describe '当番の割り当てに関するテスト',->
       getLastAssignedUserStub.returns(null)
       getAllStub.returns(usersData)
       saveAssignmentStub.returns(null)
-      assignment.assign(null, (err, preSotredFlg) ->
+      assignment.assign((err, preSotredFlg) ->
         expect(preSotredFlg==false).be.true
         done()
       )
@@ -67,21 +70,21 @@ describe '当番の割り当てに関するテスト',->
       getLastAssignedUserStub.returns(usersData[1])
       getAllStub.returns(usersData)
       saveAssignmentStub.returns(null)
-      assignment.assign(null, (err, preStoredFlg) ->
+      assignment.assign((err, preStoredFlg) ->
         expect(preStoredFlg==true).be.true
         done()
       )
 
     it '例外処理 : 通信時エラーによる access token 取得失敗', (done) ->
       authorizeStub.callsArgWith(1, null, null)
-      assignment.assign(null, (err, preSotredFlg) ->
+      assignment.assign((err, preSotredFlg) ->
         expect(err=="Failed to authorize API").be.true
         done()
       )
 
     it '例外処理 : 取得したはずの access token が null であった場合', (done) ->
       authorizeStub.callsArgWith(1, null, Error "someone error")
-      assignment.assign(null, (err, preSotredFlg) ->
+      assignment.assign((err, preSotredFlg) ->
         expect(err?).be.true
         done()
       )
@@ -89,7 +92,7 @@ describe '当番の割り当てに関するテスト',->
     it '例外処理 : 日付取得失敗', (done) ->
       authorizeStub.callsArgWith(1, true, null)
       getEventsStub.callsArgWith(2, null)
-      assignment.assign(null, (err, preSotredFlg) ->
+      assignment.assign((err, preSotredFlg) ->
         expect(err=="There are no events on calendar for assignment").be.true
         done()
       )
@@ -100,14 +103,14 @@ describe '当番の割り当てに関するテスト',->
       getLastAssignedMonthStub.returns(null)
       getLastAssignedUserStub.returns(null)
       getAllStub.returns(null)
-      assignment.assign(null, (err, preSotredFlg) ->
+      assignment.assign((err, preSotredFlg) ->
         expect(err=="There are no users for assignment").be.true
         done()
       )
 
   context '日程へのメンバーの割り当て', ->
     it "ユーザに当番を割り当てる(先頭のメンバーから割り当て)", ->
-      assign = assignment.createAssignmentsList(usersData, datesData, usersData[0]["id"])
+      assign = assignment.createList(usersData, datesData, usersData[0]["id"])
       expect(assign.length==4).be.true
       expect(assign[0]["date"]=="2016-04-01").be.true
       expect(assign[1]["date"]=="2016-04-10").be.true
@@ -119,7 +122,7 @@ describe '当番の割り当てに関するテスト',->
       expect(assign[3]["assign"]=="tasuwo").be.true
 
     it "ユーザに当番を割り当てる(途中のメンバーから割り当て)", ->
-      assign = assignment.createAssignmentsList(usersData, datesData, usersData[1]["id"])
+      assign = assignment.createList(usersData, datesData, usersData[1]["id"])
       expect(assign.length==4).be.true
       expect(assign[0]["date"]=="2016-04-01").be.true
       expect(assign[1]["date"]=="2016-04-10").be.true
@@ -131,8 +134,8 @@ describe '当番の割り当てに関するテスト',->
       expect(assign[3]["assign"]=="tozawa").be.true
 
     it "不正な引数が与えられた場合には例外を発生させる", ->
-      expect(assignment.createAssignmentsList.bind(assignment, [], datesData, usersData[0]["name"])).to.throw(Error)
-      expect(assignment.createAssignmentsList.bind(assignment, usersData, [], usersData[0]["name"])).to.throw(Error)
+      expect(assignment.createList.bind(assignment, [], datesData, usersData[0]["name"])).to.throw(Error)
+      expect(assignment.createList.bind(assignment, usersData, [], usersData[0]["name"])).to.throw(Error)
 
   context '当番となるメンバー達を，システムへの登録順に基づいて決定する', ->
     it "当番人数 <= 全メンバー数 であり，割り当てが先頭のメンバーに戻らない場合", ->

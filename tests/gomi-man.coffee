@@ -1,7 +1,7 @@
 Helper = require('hubot-test-helper')
 helper = new Helper('./../scripts/gomi-man.coffee')
 user   = require('./../scripts/user.coffee')
-as     = require('./../scripts/assignment.coffee')
+Assignment = require('./../scripts/assignment.coffee')
 
 expect = require('chai').expect
 co     = require('co')
@@ -9,9 +9,11 @@ sinon  = require('sinon')
 
 describe 'ユーザコマンドのテスト', ->
   room = null
+  assignment = null
 
   beforeEach ->
     room = helper.createRoom()
+    assignment = new Assignment(null)
 
   afterEach ->
     room.destroy()
@@ -239,7 +241,7 @@ describe 'ユーザコマンドのテスト', ->
         {"id":1, "date":"2016-10-3", "duty":"ゴミ捨て", "assign":"tozawa"},
         {"id":2, "date":"2016-10-20", "duty":"ゴミ捨て", "assign":"tasuku"}
       ]
-      getAssignmentsListStub = sinon.stub(as, 'getAssignmentsList')
+      getAssignmentsListStub = sinon.stub(assignment, 'getList')
       getAssignmentsListStub.returns(assignmentsList)
       co =>
         yield room.user.say 'alice', 'hubot assign list'
@@ -249,7 +251,7 @@ describe 'ユーザコマンドのテスト', ->
           ['hubot', '`1` date:2016-10-3, duty:ゴミ捨て, member:tozawa']
           ['hubot', '`2` date:2016-10-20, duty:ゴミ捨て, member:tasuku']
         ]
-      as.getAssignmentsList.restore()
+      assignment.getList.restore()
 
     it 'ユーザ割り当てを途中から開始する', (done)->
       usersData = [
