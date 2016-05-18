@@ -16,10 +16,10 @@ class Assignment
       return
     this.setList(assignments)
     @robot.brain.set(
-      Assignments.LAST_USER_KEY,
+      Assignment.LAST_USER_KEY,
       assignments[assignments.length-1]["assign"])
     @robot.brain.set(
-      Assignments.LAST_MONTH_KEY,
+      Assignment.LAST_MONTH_KEY,
       parseInt(Object.keys(dates)[0].split("-")[1]))
 
   setList: (assignments) ->
@@ -28,7 +28,7 @@ class Assignment
     i = 1
     assignments.map (assignment) ->
       assignment["id"] = i++
-    @robot.brain.set Assignments.LIST_KEY, assignments
+    @robot.brain.set Assignment.LIST_KEY, assignments
 
   getList: () ->
     @robot.brain.get Assignment.LIST_KEY or null
@@ -57,7 +57,7 @@ class Assignment
     assignments[id2-1]["assign"] = tmp
     this.setList(assignments)
 
-  generateStringFrom: (assignments) ->
+  generateStringForm: (assignments) ->
     unless assignments?
       return [ "There are no assignments. Please assign users to duty by `assign users` command." ]
     msg = []

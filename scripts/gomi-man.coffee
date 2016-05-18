@@ -71,14 +71,14 @@ module.exports = (robot) ->
   regex = "assign users$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
     try
-      assignment.assign(robot, (err, preStoredFlg) ->
+      assignment.assign((err, preStoredFlg) ->
         if err
           msg.send err
           return
         messages = if preStoredFlg
         then ["Assignment of this month has perfomed as follows"]
         else ["Some members were assigned to duty as follows!"]
-        Array.prototype.push.apply(messages, assignment.getStringOf(assignment.getList()))
+        Array.prototype.push.apply(messages, assignment.generateStringForm(assignment.getList()))
 
         msg.send messages.join("\n")
 
@@ -89,7 +89,7 @@ module.exports = (robot) ->
 
   regex = "assign list$"; regexes.push regex
   robot.respond "/"+regex+"/", (msg) ->
-    messages = assignment.generateStringFrom(assignment.getList())
+    messages = assignment.generateStringForm(assignment.getList())
     msg.send messages.join("\n")
 
   regex = "assign swap [0-9]+ [0-9]+"
@@ -98,7 +98,7 @@ module.exports = (robot) ->
     id2 = parseInt(msg.match[0].replace(/\s+/g, " ").split(" ")[4])
     try
       assignment.swap(id1, id2)
-      cronJobManager.startJobsBasedOn(assignment.getList(robot), notificationChannel.get())
+      cronJobManager.startJobsBasedOn(assignment.getList(), notificationChannel.get())
       msg.send "Successfully swapped!"
     catch error
       msg.send error
@@ -213,7 +213,7 @@ module.exports = (robot) ->
     reader = null
     switch log_kind
       when "cron"
-        log_fname = cronJobManager.LOG_FNAME
+        log_fname = CronJobManager.LOG_FNAME
         reader = (new Logger log_fname).getReader()
       else
         msg.send "There are no log for #{log_kind}"; return

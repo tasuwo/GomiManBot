@@ -52,7 +52,7 @@ class CronJobManager
   resetAssignedCronJobs: () ->
     if @assignedCronJobs.length >0
       for job in @assignedCronJobs
-        job.srttop()
+        job.stop()
       @assignedCronJobs = []
 
   getAssignedCronJobs: () ->
