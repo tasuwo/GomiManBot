@@ -64,21 +64,24 @@ class CronJobManager
         msg.push job
 
   startMonthlyJobTo: (channel) ->
-    @monthlyJob = new CronJob('0 0 12 1 */1 *', () =>
-      envelope = room: (channel or "general")
-      messages = [ "@channel Check!" ]
-      @assignment.assign(@robot, (resultMsgs, err) ->
-        if err
-          this._sendMessage envelope, "Error: " + err + ", so cannnot extcute cron job"
-        for resultMsg in resultMsgs
-          messages.push resultMsg
-        for message in messages
-          this._sendMessage envelope, message
-      )
-    )
+    @monthlyJob = new CronJob(
+      cronTime: "0 0 12 1 */1 *"
+      start:    true
+      context:  {
+        channel: channel,
+      }
+      onTick: =>
+        envelope = room: (this.channel or "general")
+        messages = [ "@channel Check!" ]
+        @assignment.assign(@robot, (resultMsgs, err) ->
+          if err
+            this._sendMessage envelope, "Error: " + err + ", so cannnot extcute cron job"
+          for resultMsg in resultMsgs
+            messages.push resultMsg
+          for message in messages
+            this._sendMessage envelope, message
+        ))
     @logger.info("Save monthly cron job")
-
-    @monthlyJob.start()
 
   startJobsBasedOn: (assignments, channel) ->
     unless assignments?
@@ -89,15 +92,19 @@ class CronJobManager
       assignedDate = CronSettingConverter.convertDateToCronSetting(assignment["date"])
       notifiedDate = CronSettingConverter.convertCronSettingToDayBefore(assignedDate)
       CronJobManager.LOGS.push(
-        new CronJob(notifiedDate, () =>
-          envelope = room: (channel or "general")
-          this._sendMessage envelope, "@"+assignment["assign"]+" You are assigned to duty in tommorow"
+        new CronJob(
+          cronTime: notifiedDate
+          start:    true
+          context:  {
+            channel: channel,
+            assignment: assignment
+          }
+          onTick: =>
+            envelope = room: (this.channel or "general")
+            this._sendMessage envelope, "@"+this.assignment["assign"]+" You are assigned to duty in tommorow"
         )
       )
       @logger.info("Save assignments cron job : date:%s, user:%s", notifiedDate, assignment["assign"])
-
-    for job in CronJobManager.LOGS
-      job.start()
 
 module.exports = {
   CronSettingConverter
